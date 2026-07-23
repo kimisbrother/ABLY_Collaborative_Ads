@@ -3,367 +3,583 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABLY 협력광고 리포트</title>
+<title>협력광고 리포트</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <style>
-  :root{
-    --bg:#FAF9F6;
-    --surface:#FFFFFF;
-    --ink:#16171A;
-    --ink-soft:#6B6D74;
-    --ink-faint:#9C9DA3;
-    --line:#E8E6E0;
-    --line-soft:#F1EFE9;
-    --accent:#FF4757;
-    --accent-soft:#FFEEEF;
-    --accent-ink:#C21E2B;
-    --good:#1F9D55;
-    --warn:#C77B00;
-    --radius:14px;
-    --radius-sm:8px;
-    --shadow:0 1px 2px rgba(20,20,20,.04), 0 8px 24px rgba(20,20,20,.05);
-    --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
-    --display: 'Space Grotesk', 'Pretendard', sans-serif;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    min-height:100vh;
-  }
-  button{font-family:inherit;}
-  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+/* ============================================================
+   Design tokens
+=============================================================*/
+:root{
+  color-scheme: light;
+  --page:#f9f9f7;
+  --surface:#ffffff;
+  --surface-2:#f3f2ee;
+  --surface-raised:#ffffff;
+  --text-primary:#0b0b0b;
+  --text-secondary:#52514e;
+  --text-muted:#898781;
+  --border:#e5e3dc;
+  --border-strong:#c3c2b7;
+  --brand:#FF4757;
+  --brand-ink:#C21E2B;
+  --brand-soft:#FFEEEF;
 
-  /* ---------- Layout shells ---------- */
-  #screenLoading{
-    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-    background:var(--bg); z-index:50; font-size:13px; color:var(--ink-faint); letter-spacing:.02em;
-  }
-  .hidden{display:none !important;}
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a; --series-4:#eda100;
+  --series-5:#e87ba4; --series-6:#008300; --series-7:#4a3aa7; --series-8:#e34948;
 
-  /* ---------- Login ---------- */
-  #loginScreen{
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
-  }
-  .login-card{
-    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--line);
-    border-radius:var(--radius); padding:40px 32px 32px; box-shadow:var(--shadow);
-  }
-  .login-mark{
-    width:34px; height:34px; border-radius:9px; background:var(--ink);
-    display:flex; align-items:center; justify-content:center; margin-bottom:20px;
-  }
-  .login-mark span{color:#fff; font-weight:800; font-size:15px; letter-spacing:-.02em;}
-  .login-card h1{font-size:20px; font-weight:700; margin:0 0 24px; letter-spacing:-.01em; font-family:var(--display);}
-  .login-card p.sub{font-size:13px; color:var(--ink-soft); margin:0 0 28px; line-height:1.5;}
-  .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-bottom:6px;}
-  .field input{
-    width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:var(--radius-sm);
-    font-size:14px; font-family:inherit; background:var(--bg); color:var(--ink); transition:.15s border-color;
-  }
-  .field input:focus{outline:none; border-color:var(--ink);}
-  .btn{
-    appearance:none; border:none; cursor:pointer; font-weight:600; font-size:14px;
-    border-radius:var(--radius-sm); padding:12px 18px; transition:.15s transform, .15s opacity;
-  }
-  .btn:active{transform:scale(.98);}
-  .btn-primary{background:var(--ink); color:#fff; width:100%; margin-top:6px;}
-  .btn-primary:hover{opacity:.88;}
-  .btn-ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--line);}
-  .btn-accent{background:var(--accent); color:#fff;}
-  .btn-sm{padding:8px 12px; font-size:12.5px;}
-  .login-error{
-    display:none; margin-top:12px; padding:10px 12px; background:var(--accent-soft); color:var(--accent-ink);
-    border-radius:var(--radius-sm); font-size:12.5px; line-height:1.5;
-  }
-  .login-foot{margin-top:22px; text-align:center;}
-  .link-btn{
-    background:none; border:none; color:var(--ink-faint); font-size:12px; cursor:pointer; text-decoration:underline;
-    text-underline-offset:2px;
-  }
+  --seq-100:#cde2fb; --seq-150:#b7d3f6; --seq-200:#9ec5f4; --seq-250:#86b6ef;
+  --seq-300:#6da7ec; --seq-350:#5598e7; --seq-400:#3987e5; --seq-450:#2a78d6;
+  --seq-500:#256abf; --seq-550:#1c5cab; --seq-600:#184f95; --seq-650:#104281; --seq-700:#0d366b;
 
-  /* ---------- Dashboard shell ---------- */
-  #dashboard{min-height:100vh; display:none;}
-  .topbar{
-    position:sticky; top:0; z-index:20; background:rgba(250,249,246,.9); backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line); padding:14px 28px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .topbar-left{display:flex; align-items:center; gap:10px;}
-  .topbar-left .dot{width:8px; height:8px; border-radius:50%; background:var(--accent);}
-  .topbar-title{font-size:14px; font-weight:700; letter-spacing:-.01em; font-family:var(--display);}
-  .topbar-sub{font-size:11.5px; color:var(--ink-faint); margin-left:8px;}
-  .topbar-right{display:flex; align-items:center; gap:8px;}
-  .icon-btn{
-    width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--surface);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-soft); font-size:14px;
-  }
-  .icon-btn:hover{border-color:var(--ink); color:var(--ink);}
+  --good-text:#006300; --good-bg:#eafbef;
+  --critical-text:#b02e2e; --critical-bg:#fdecec;
+  --warning-text:#8a5a00; --warning-bg:#fff4e0;
 
-  .container{max-width:1120px; margin:0 auto; padding:28px 28px 64px;}
-
-  /* brief card */
-  .brief{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-    padding:26px 28px; margin-bottom:16px; box-shadow:var(--shadow);
+  --grid:#eceae2;
+  --baseline:#c3c2b7;
+  --radius-lg:18px; --radius-md:13px; --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(20,20,20,.04);
+  --shadow-md:0 1px 2px rgba(20,20,20,.04), 0 10px 28px rgba(20,20,20,.06);
+  --mono:'JetBrains Mono','SF Mono', ui-monospace, monospace;
+  --display:'Space Grotesk','Pretendard', sans-serif;
+  --sidebar-w:236px;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --page:#0c0c0b; --surface:#171715; --surface-2:#1f1f1c; --surface-raised:#1c1c1a;
+    --text-primary:#f5f5f3; --text-secondary:#c3c2b7; --text-muted:#8b8a83;
+    --border:#2c2c29; --border-strong:#3a3a36;
+    --brand:#ff5b69; --brand-ink:#ff8b93; --brand-soft:rgba(255,71,87,.14);
+    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+    --series-5:#d55181; --series-6:#2fbf2f; --series-7:#9085e9; --series-8:#e66767;
+    --good-text:#5fd35f; --good-bg:rgba(12,163,12,.16);
+    --critical-text:#ff8b8b; --critical-bg:rgba(208,59,59,.18);
+    --warning-text:#ffcf70; --warning-bg:rgba(250,178,25,.16);
+    --grid:#282825; --baseline:#3a3a36;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --shadow-md:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.4);
   }
-  .brief-top{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
-  .brief-period-wrap{display:flex; flex-direction:column; align-items:flex-end; gap:6px; width:180px;}
-  .brief-brand{font-size:23px; font-weight:700; letter-spacing:-.01em; font-family:var(--display);}
-  .brief-period{font-size:12.5px; color:var(--ink-soft); font-family:var(--mono);}
-  .brief-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:1px solid var(--line-soft);}
-  .brief-stat{padding:16px 18px 4px 0; border-right:1px solid var(--line-soft);}
-  .brief-stat:last-child{border-right:none;}
-  .brief-stat .k{font-size:11.5px; color:var(--ink-faint); font-weight:600; margin-bottom:6px;}
-  .brief-stat .v{font-size:20px; font-weight:600; letter-spacing:-.01em; font-family:var(--mono);}
-  .brief-stat .v small{font-size:12px; font-weight:600; color:var(--ink-faint); margin-left:2px;}
-  .progress-wrap{margin-top:10px;}
-  .progress-wrap.mini{margin-top:0; width:100%;}
-  .progress-bar{height:5px; background:var(--line-soft); border-radius:4px; overflow:hidden;}
-  .progress-fill{height:100%; background:var(--ink); border-radius:4px;}
-  .progress-label{font-size:10.5px; color:var(--ink-faint); margin-top:5px; font-family:var(--mono);}
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0c0c0b; --surface:#171715; --surface-2:#1f1f1c; --surface-raised:#1c1c1a;
+  --text-primary:#f5f5f3; --text-secondary:#c3c2b7; --text-muted:#8b8a83;
+  --border:#2c2c29; --border-strong:#3a3a36;
+  --brand:#ff5b69; --brand-ink:#ff8b93; --brand-soft:rgba(255,71,87,.14);
+  --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --series-5:#d55181; --series-6:#2fbf2f; --series-7:#9085e9; --series-8:#e66767;
+  --good-text:#5fd35f; --good-bg:rgba(12,163,12,.16);
+  --critical-text:#ff8b8b; --critical-bg:rgba(208,59,59,.18);
+  --warning-text:#ffcf70; --warning-bg:rgba(250,178,25,.16);
+  --grid:#282825; --baseline:#3a3a36;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.4);
+}
 
-  /* insight card */
-  .insight{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-    padding:18px 22px; margin-bottom:24px; display:flex; gap:14px; align-items:flex-start;
-  }
-  .insight .tag{
-    flex-shrink:0; font-size:10.5px; font-weight:700; color:var(--accent-ink); background:var(--accent-soft);
-    padding:4px 8px; border-radius:6px; letter-spacing:.02em;
-  }
-  .insight ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px;}
-  .insight li{font-size:12.8px; color:var(--ink); line-height:1.5; font-family:var(--mono);}
-  .insight li b{font-weight:700;}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page); color:var(--text-primary);
+  font-family:'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+button, input, select{font-family:inherit;}
+::selection{background:var(--brand-soft); color:var(--brand-ink);}
+a{color:inherit;}
+.hidden{display:none !important;}
 
-  /* tabs */
-  .tabs{display:flex; gap:4px; margin-bottom:18px; border-bottom:1px solid var(--line);}
-  .tab-btn{
-    background:none; border:none; cursor:pointer; padding:10px 4px; margin-right:22px; font-size:13.5px;
-    font-weight:600; color:var(--ink-faint); border-bottom:2px solid transparent; margin-bottom:-1px;
-  }
-  .tab-btn.active{color:var(--ink); border-bottom-color:var(--ink);}
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
+/* ---------- Loading ---------- */
+#screenLoading{
+  position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  background:var(--page); z-index:50; font-size:12.5px; color:var(--text-muted); letter-spacing:.02em;
+}
+.boot-mark{width:36px; height:36px; border-radius:10px; background:var(--brand); position:relative; overflow:hidden;}
+.boot-mark::after{
+  content:""; position:absolute; inset:0; background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  animation:sheen 1.1s ease-in-out infinite;
+}
+@keyframes sheen{ from{transform:translateX(-100%);} to{transform:translateX(100%);} }
 
-  /* section card */
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin-bottom:18px; box-shadow:var(--shadow);}
-  .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
-  .card-head h3{font-size:13.5px; font-weight:700; margin:0; letter-spacing:-.01em;}
-  .card-head .hint{font-size:11px; color:var(--ink-faint);}
-  .chart-box{height:240px; position:relative;}
+/* ---------- Login ---------- */
+#loginScreen{ min-height:100vh; display:flex; }
+.login-visual{
+  flex:1.1; position:relative; display:flex; flex-direction:column; justify-content:space-between;
+  padding:52px 56px; color:#fff; overflow:hidden;
+  background:
+    radial-gradient(720px 480px at 8% 8%, rgba(255,255,255,.14), transparent 60%),
+    radial-gradient(640px 520px at 92% 88%, rgba(255,255,255,.10), transparent 55%),
+    linear-gradient(155deg, #16171A 0%, #23242a 55%, var(--brand-ink) 150%);
+}
+.login-visual .lv-brand{display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:-.01em;}
+.login-visual .lv-brand .mark{width:30px; height:30px; border-radius:8px; background:var(--brand); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;}
+.login-visual .lv-copy{max-width:420px;}
+.login-visual .lv-copy h2{font-family:var(--display); font-size:34px; line-height:1.28; letter-spacing:-.02em; margin:0 0 16px; font-weight:600;}
+.login-visual .lv-copy p{font-size:14px; line-height:1.7; color:rgba(255,255,255,.68); margin:0;}
+.login-visual .lv-stats{display:flex; gap:28px; margin-top:36px;}
+.login-visual .lv-stats div b{display:block; font-family:var(--mono); font-size:20px; font-weight:700;}
+.login-visual .lv-stats div span{font-size:11px; color:rgba(255,255,255,.55);}
+.login-visual .lv-foot{font-size:11px; color:rgba(255,255,255,.4); font-family:var(--mono);}
 
-  /* table */
-  .table-scroll{overflow-x:auto;}
-  table{width:100%; border-collapse:collapse; font-size:12.3px; white-space:nowrap;}
-  thead th{
-    text-align:right; font-weight:600; color:var(--ink-soft); padding:8px 10px; border-bottom:1px solid var(--line);
-    font-size:11px; letter-spacing:.01em;
-  }
-  thead th:first-child{text-align:left;}
-  tbody td{padding:8px 10px; border-bottom:1px solid var(--line-soft); text-align:right; font-family:var(--mono);}
-  tbody td:first-child{text-align:left; font-family:'Pretendard', sans-serif; font-weight:500;}
-  tbody tr:hover{background:var(--line-soft);}
-  tbody tr.total-row{font-weight:700; background:var(--bg);}
-  tbody tr.total-row td{border-top:1px solid var(--ink); border-bottom:none;}
-  tbody tr.best-row td:first-child{color:var(--accent-ink); font-weight:700;}
+.login-form-wrap{
+  flex:1; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--page);
+}
+.login-card{ width:100%; max-width:360px; }
+.login-card h1{font-size:21px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; font-family:var(--display);}
+.login-card p.sub{font-size:13px; color:var(--text-secondary); margin:0 0 28px; line-height:1.5;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;}
+.field input{
+  width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius-sm);
+  font-size:14px; font-family:inherit; background:var(--surface); color:var(--text-primary); transition:.15s border-color,.15s box-shadow;
+}
+.field input:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft);}
+.btn{
+  appearance:none; border:none; cursor:pointer; font-weight:600; font-size:13.5px;
+  border-radius:var(--radius-sm); padding:11px 16px; transition:.15s transform,.15s opacity,.15s background;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--brand); color:#fff; width:100%; margin-top:6px;}
+.btn-primary:hover{opacity:.9;}
+.btn-dark{background:var(--text-primary); color:var(--page);}
+.btn-dark:hover{opacity:.88;}
+.btn-ghost{background:transparent; color:var(--text-secondary); border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--border-strong); color:var(--text-primary);}
+.btn-sm{padding:8px 12px; font-size:12.5px;}
+.login-error{
+  display:none; margin-top:12px; padding:10px 12px; background:var(--critical-bg); color:var(--critical-text);
+  border-radius:var(--radius-sm); font-size:12.5px; line-height:1.5;
+}
+.login-foot{margin-top:22px; text-align:center;}
+.link-btn{ background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
 
-  .empty-note{padding:32px 0; text-align:center; color:var(--ink-faint); font-size:12.5px;}
+@media (max-width: 880px){ .login-visual{display:none;} }
 
-  /* best creative highlight */
-  .best-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;}
-  .best-card{background:var(--ink); color:#fff; border-radius:var(--radius); padding:18px 20px;}
-  .best-card .k{font-size:10.5px; color:rgba(255,255,255,.55); font-weight:600; margin-bottom:8px; letter-spacing:.02em;}
-  .best-card .name{font-size:15px; font-weight:700; margin-bottom:10px;}
-  .best-card .metric{font-size:22px; font-weight:800; font-family:var(--mono);}
-  .best-card .metric small{font-size:11px; color:rgba(255,255,255,.55); font-weight:600; margin-left:4px;}
+/* ---------- App shell ---------- */
+#dashboard{min-height:100vh; display:none;}
+.app-shell{display:flex; min-height:100vh;}
 
-  /* settings */
-  #settingsOverlay{
-    position:fixed; inset:0; background:rgba(20,20,20,.4); z-index:40; display:none;
-    align-items:flex-start; justify-content:center; padding:5vh 20px; overflow-y:auto;
-  }
-  .settings-panel{
-    background:var(--surface); border-radius:var(--radius); width:100%; max-width:560px;
-    padding:28px 28px 24px; box-shadow:var(--shadow); margin-bottom:5vh;
-  }
-  .settings-panel h2{font-size:16px; margin:0 0 4px;}
-  .settings-panel p.sub{font-size:12.5px; color:var(--ink-soft); margin:0 0 22px;}
-  .settings-section{border-top:1px solid var(--line-soft); padding-top:16px; margin-top:16px;}
-  .settings-section h4{font-size:12.5px; font-weight:700; margin:0 0 12px; display:flex; align-items:center; gap:6px;}
-  .settings-section h4 .num{
-    width:18px; height:18px; border-radius:50%; background:var(--ink); color:#fff; font-size:10px;
-    display:inline-flex; align-items:center; justify-content:center; font-weight:700;
-  }
-  .map-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  select{
-    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
-    font-size:13px; font-family:inherit; background:var(--bg); color:var(--ink);
-  }
-  .settings-actions{display:flex; gap:8px; margin-top:22px;}
-  .settings-actions .btn{flex:1;}
-  .status-msg{font-size:11.5px; margin-top:8px; padding:8px 10px; border-radius:8px; display:none;}
-  .status-msg.ok{display:block; background:#EAFBEF; color:var(--good);}
-  .status-msg.err{display:block; background:var(--accent-soft); color:var(--accent-ink);}
-  .settings-close{position:absolute; top:20px; right:22px; background:none; border:none; font-size:18px; cursor:pointer; color:var(--ink-faint);}
-  .settings-panel{position:relative;}
+/* sidebar */
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--surface); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh; z-index:30;
+}
+.sidebar-brand{display:flex; align-items:center; gap:9px; padding:20px 18px 16px;}
+.sidebar-brand .mark{width:28px; height:28px; border-radius:8px; background:var(--brand); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px;}
+.sidebar-brand .name{font-family:var(--display); font-weight:700; font-size:14.5px; letter-spacing:-.01em;}
+.sidebar-nav{padding:8px 12px; display:flex; flex-direction:column; gap:2px;}
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:var(--radius-sm);
+  color:var(--text-secondary); font-size:13.2px; font-weight:600; cursor:pointer; border:none; background:none; text-align:left; width:100%;
+  transition:.12s background, .12s color;
+}
+.nav-item svg{width:16px; height:16px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.8;}
+.nav-item:hover{background:var(--surface-2); color:var(--text-primary);}
+.nav-item.active{background:var(--text-primary); color:var(--page);}
+.sidebar-section-label{padding:16px 12px 6px; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--text-muted); text-transform:uppercase;}
+.sidebar-spacer{flex:1;}
+.sidebar-foot{padding:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:2px;}
+.sidebar-brief{padding:12px; margin:4px 12px 10px; background:var(--surface-2); border-radius:var(--radius-md); border:1px solid var(--border);}
+.sidebar-brief .sb-name{font-weight:700; font-size:13px; margin-bottom:2px;}
+.sidebar-brief .sb-period{font-size:10.5px; color:var(--text-muted); font-family:var(--mono); margin-bottom:8px;}
+.sidebar-brief .sb-bar{height:4px; background:var(--border); border-radius:4px; overflow:hidden;}
+.sidebar-brief .sb-bar i{display:block; height:100%; background:var(--brand);}
+.sidebar-brief .sb-label{font-size:10px; color:var(--text-muted); margin-top:5px; font-family:var(--mono);}
 
-  /* comparison cards (DoD / WoW) */
-  .compare-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;}
-  .compare-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow);}
-  .compare-card h4{font-size:12.5px; font-weight:700; margin:0 0 4px;}
-  .compare-card .range{font-size:10.5px; color:var(--ink-faint); font-family:var(--mono); margin-bottom:12px;}
-  .compare-row{display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-top:1px solid var(--line-soft);}
-  .compare-row:first-of-type{border-top:none;}
-  .compare-row .m-label{font-size:12px; color:var(--ink-soft); font-weight:500;}
-  .compare-row .m-val{font-size:12.8px; font-weight:700; font-family:var(--mono);}
-  .compare-row .m-delta{font-size:11px; font-weight:700; font-family:var(--mono); margin-left:8px; padding:2px 6px; border-radius:5px;}
-  .m-delta.up{color:var(--good); background:#EAFBEF;}
-  .m-delta.down{color:var(--accent-ink); background:var(--accent-soft);}
-  .m-delta.flat{color:var(--ink-faint); background:var(--line-soft);}
+.sidebar-backdrop{display:none;}
 
-  @media (max-width: 720px){
-    .brief-grid{grid-template-columns:repeat(2,1fr);}
-    .brief-stat{border-right:none; border-bottom:1px solid var(--line-soft); padding-bottom:12px;}
-    .best-grid{grid-template-columns:1fr;}
-    .container{padding:20px 16px 48px;}
-    .topbar{padding:12px 16px;}
-    .map-grid{grid-template-columns:1fr;}
-    .compare-grid{grid-template-columns:1fr;}
-    .brief-period-wrap{width:100%; align-items:flex-start;}
+/* mobile bottom / top nav fallback */
+.mobile-topbar{display:none;}
+
+@media (max-width: 980px){
+  .sidebar{
+    position:fixed; left:0; top:0; transform:translateX(-100%); transition:.2s transform; box-shadow:var(--shadow-md);
   }
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(10,10,10,.35); z-index:29;
+  }
+  .sidebar-backdrop.show{display:block;}
+  .mobile-topbar{
+    display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border);
+    background:var(--surface); position:sticky; top:0; z-index:20;
+  }
+  .mobile-topbar .name{font-weight:700; font-size:14px; font-family:var(--display);}
+}
+
+/* main */
+.main{flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:16px 32px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.topbar-left{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.topbar-crumb{font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
+.topbar-title{font-size:16px; font-weight:700; letter-spacing:-.01em; font-family:var(--display); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.topbar-right{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+.topbar-updated{font-size:11px; color:var(--text-muted); font-family:var(--mono); margin-right:4px; display:none;}
+@media (min-width:700px){ .topbar-updated{display:inline;} }
+.icon-btn{
+  width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); font-size:14px;
+  transition:.12s border-color, .12s color;
+}
+.icon-btn:hover{border-color:var(--text-primary); color:var(--text-primary);}
+.hamburger{display:none;}
+@media (max-width:980px){ .hamburger{display:flex;} }
+
+.content{max-width:1180px; margin:0 auto; padding:24px 32px 72px;}
+@media (max-width:720px){ .content{padding:18px 16px 56px;} .topbar{padding:12px 16px;} }
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* ---------- generic sections ---------- */
+.section-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:28px 0 14px;}
+.section-head:first-child{margin-top:0;}
+.section-head h2{font-size:15px; font-weight:700; margin:0; letter-spacing:-.01em;}
+.section-head .hint{font-size:11.5px; color:var(--text-muted);}
+
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:16px; box-shadow:var(--shadow-sm);}
+.card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap;}
+.card-head h3{font-size:13.5px; font-weight:700; margin:0; letter-spacing:-.01em;}
+.card-head .hint{font-size:11px; color:var(--text-muted);}
+.chart-box{height:240px; position:relative;}
+.chart-box.tall{height:300px;}
+
+/* ---------- hero / brief ---------- */
+.hero{
+  background:linear-gradient(155deg, var(--text-primary) 0%, #2b2c31 100%); color:#fff;
+  border-radius:var(--radius-lg); padding:26px 28px; margin-bottom:18px; box-shadow:var(--shadow-md); position:relative; overflow:hidden;
+}
+.hero::before{
+  content:""; position:absolute; inset:0; background:radial-gradient(420px 260px at 100% 0%, rgba(255,71,87,.28), transparent 65%);
+  pointer-events:none;
+}
+.hero-top{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; position:relative;}
+.hero-brand{font-size:22px; font-weight:700; letter-spacing:-.01em; font-family:var(--display);}
+.hero-brand .badge{display:inline-block; margin-left:8px; font-size:10.5px; font-weight:700; color:#fff; background:var(--brand); padding:3px 8px; border-radius:6px; vertical-align:middle; letter-spacing:.02em;}
+.hero-period{font-size:12px; color:rgba(255,255,255,.55); font-family:var(--mono); margin-top:4px;}
+.hero-progress{width:200px; flex-shrink:0;}
+.hero-progress .label{font-size:10.5px; color:rgba(255,255,255,.55); font-family:var(--mono); margin-bottom:6px; text-align:right;}
+.hero-bar{height:5px; background:rgba(255,255,255,.14); border-radius:4px; overflow:hidden;}
+.hero-bar i{display:block; height:100%; background:#fff; border-radius:4px;}
+
+/* ---------- KPI grid ---------- */
+.kpi-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:18px;}
+@media (max-width:1080px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} }
+@media (max-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+.kpi-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; min-height:108px;}
+.kpi-top{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px;}
+.kpi-label{font-size:11px; color:var(--text-muted); font-weight:600;}
+.kpi-value{font-size:19px; font-weight:700; letter-spacing:-.01em; font-family:var(--display); margin-bottom:auto;}
+.kpi-foot{margin-top:8px;}
+.kpi-sub{font-size:10.5px; color:var(--text-muted); font-family:var(--mono);}
+
+.delta{font-size:10.5px; font-weight:700; font-family:var(--mono); padding:2px 6px; border-radius:5px; white-space:nowrap;}
+.delta.up{color:var(--good-text); background:var(--good-bg);}
+.delta.down{color:var(--critical-text); background:var(--critical-bg);}
+.delta.flat{color:var(--text-muted); background:var(--surface-2);}
+
+.spark{width:100%; height:30px; display:block;}
+.spark-area{fill:var(--series-1); opacity:.14;}
+.spark-line{fill:none; stroke:var(--series-1); stroke-width:2; stroke-linejoin:round; stroke-linecap:round;}
+.spark-dot{fill:var(--series-1);}
+
+.meter-track{height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden;}
+.meter-track i{display:block; height:100%; background:var(--series-1); border-radius:4px;}
+.meter-label{font-size:10px; color:var(--text-muted); margin-top:5px; font-family:var(--mono);}
+
+/* ---------- insight ---------- */
+.insight{
+  background:var(--brand-soft); border:1px solid color-mix(in srgb, var(--brand) 30%, transparent); border-radius:var(--radius-md);
+  padding:16px 20px; margin-bottom:22px; display:flex; gap:14px; align-items:flex-start;
+}
+.insight .tag{ flex-shrink:0; font-size:10.5px; font-weight:700; color:#fff; background:var(--brand); padding:4px 8px; border-radius:6px; letter-spacing:.03em; margin-top:1px;}
+.insight ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px;}
+.insight li{font-size:12.6px; color:var(--text-primary); line-height:1.55; font-family:var(--mono);}
+
+/* ---------- compare cards ---------- */
+.compare-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:6px;}
+@media (max-width:720px){ .compare-grid{grid-template-columns:1fr;} }
+.compare-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; box-shadow:var(--shadow-sm);}
+.compare-card h4{font-size:12.5px; font-weight:700; margin:0 0 4px;}
+.compare-card .range{font-size:10.5px; color:var(--text-muted); font-family:var(--mono); margin-bottom:10px;}
+.compare-row{display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-top:1px solid var(--surface-2);}
+.compare-row:first-of-type{border-top:none;}
+.compare-row .m-label{font-size:12px; color:var(--text-secondary); font-weight:500;}
+.compare-row .m-val{font-size:12.8px; font-weight:700; font-family:var(--mono);}
+.compare-row .m-delta{margin-left:8px;}
+
+/* ---------- funnel ---------- */
+.funnel-row{display:grid; grid-template-columns:96px 1fr 108px; align-items:center; gap:12px; margin-bottom:6px;}
+.funnel-label{font-size:12px; font-weight:600; color:var(--text-secondary);}
+.funnel-track{height:26px; background:var(--surface-2); border-radius:6px; overflow:hidden;}
+.funnel-bar{height:100%; border-radius:6px; min-width:6px; transition:width .4s ease;}
+.funnel-value{font-size:12.5px; font-weight:700; font-family:var(--mono); text-align:right;}
+.funnel-rate{font-size:10.5px; color:var(--text-muted); font-family:var(--mono); margin:2px 0 10px 108px;}
+
+/* ---------- metric toggle ---------- */
+.pill-row{display:flex; gap:6px; flex-wrap:wrap;}
+.pill{
+  border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); font-size:12px; font-weight:600;
+  padding:6px 12px; border-radius:100px; cursor:pointer; transition:.12s all;
+}
+.pill:hover{border-color:var(--border-strong); color:var(--text-primary);}
+.pill.active{background:var(--text-primary); color:var(--page); border-color:var(--text-primary);}
+
+/* ---------- best creative ---------- */
+.best-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
+@media (max-width:720px){ .best-grid{grid-template-columns:1fr;} }
+.best-card{background:linear-gradient(150deg, var(--text-primary), #2b2c31); color:#fff; border-radius:var(--radius-lg); padding:18px 20px; position:relative; overflow:hidden;}
+.best-card::before{content:""; position:absolute; inset:0; background:radial-gradient(300px 200px at 100% 100%, rgba(255,71,87,.25), transparent 60%);}
+.best-card .k{position:relative; font-size:10.5px; color:rgba(255,255,255,.55); font-weight:700; margin-bottom:8px; letter-spacing:.03em;}
+.best-card .name{position:relative; font-size:15px; font-weight:700; margin-bottom:10px; word-break:break-word;}
+.best-card .metric{position:relative; font-size:23px; font-weight:800; font-family:var(--display);}
+.best-card .metric small{font-size:11px; color:rgba(255,255,255,.55); font-weight:600; margin-left:5px;}
+
+/* ---------- table ---------- */
+.table-scroll{overflow-x:auto;}
+table{width:100%; border-collapse:collapse; font-size:12.3px; white-space:nowrap;}
+thead th{
+  text-align:right; font-weight:600; color:var(--text-secondary); padding:8px 10px; border-bottom:1px solid var(--border);
+  font-size:11px; letter-spacing:.01em; user-select:none;
+}
+thead th:first-child{text-align:left;}
+thead th.sortable{cursor:pointer;}
+thead th.sortable:hover{color:var(--text-primary);}
+thead th.sorted{color:var(--brand-ink);}
+tbody td{padding:8px 10px; border-bottom:1px solid var(--surface-2); text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums;}
+tbody td:first-child{text-align:left; font-family:'Pretendard', sans-serif; font-weight:500;}
+tbody tr:hover{background:var(--surface-2);}
+tbody tr.total-row{font-weight:700; background:var(--surface-2);}
+tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:none;}
+
+.empty-note{padding:32px 0; text-align:center; color:var(--text-muted); font-size:12.5px;}
+
+/* ---------- settings ---------- */
+#settingsOverlay{
+  position:fixed; inset:0; background:rgba(10,10,10,.44); z-index:40; display:none;
+  align-items:flex-start; justify-content:center; padding:5vh 20px; overflow-y:auto;
+}
+.settings-panel{
+  background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:580px;
+  padding:28px 28px 24px; box-shadow:var(--shadow-md); margin-bottom:5vh; position:relative;
+}
+.settings-panel h2{font-size:16px; margin:0 0 4px;}
+.settings-panel p.sub{font-size:12.5px; color:var(--text-secondary); margin:0 0 22px;}
+.settings-section{border-top:1px solid var(--border); padding-top:16px; margin-top:16px;}
+.settings-section h4{font-size:12.5px; font-weight:700; margin:0 0 12px; display:flex; align-items:center; gap:6px;}
+.settings-section h4 .num{
+  width:18px; height:18px; border-radius:50%; background:var(--text-primary); color:var(--page); font-size:10px;
+  display:inline-flex; align-items:center; justify-content:center; font-weight:700;
+}
+.map-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+select{
+  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm);
+  font-size:13px; font-family:inherit; background:var(--page); color:var(--text-primary);
+}
+.settings-actions{display:flex; gap:8px; margin-top:22px;}
+.settings-actions .btn{flex:1;}
+.status-msg{font-size:11.5px; margin-top:8px; padding:8px 10px; border-radius:8px; display:none;}
+.status-msg.ok{display:block; background:var(--good-bg); color:var(--good-text);}
+.status-msg.err{display:block; background:var(--critical-bg); color:var(--critical-text);}
+.settings-close{position:absolute; top:20px; right:22px; background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-muted);}
+
+@media (max-width: 720px){
+  .best-grid{grid-template-columns:1fr;}
+  .map-grid{grid-template-columns:1fr;}
+  .compare-grid{grid-template-columns:1fr;}
+  .hero-top{flex-direction:column;}
+  .hero-progress{width:100%;}
+  .funnel-row{grid-template-columns:74px 1fr 90px; gap:8px;}
+  .funnel-rate{margin-left:82px;}
+}
 </style>
 </head>
 <body>
 
-<div id="screenLoading">불러오는 중…</div>
+<div id="screenLoading"><div class="boot-mark"></div>불러오는 중…</div>
 
 <!-- ===================== LOGIN ===================== -->
 <div id="loginScreen" class="hidden">
-  <div class="login-card">
-    <div class="login-mark"><span>A</span></div>
-    <h1>협력광고 리포트</h1>
-    <div class="field">
-      <label for="loginPhone">ID</label>
-      <input id="loginPhone" type="text" placeholder="ID" autocomplete="off">
+  <div class="login-visual">
+    <div class="lv-brand"><span class="mark">R</span> 협력광고 리포트</div>
+    <div class="lv-copy">
+      <h2>캠페인 성과를<br>한눈에 확인하세요</h2>
+      <p>예산 소진율부터 소재별 ROAS까지, 협력광고 운영 데이터를 하나의 대시보드에서 실시간으로 확인할 수 있어요.</p>
+      <div class="lv-stats">
+        <div><b>Daily</b><span>자동 업데이트</span></div>
+        <div><b>All</b><span>소재 · 목적 · 기간</span></div>
+        <div><b>Export</b><span>엑셀 다운로드</span></div>
+      </div>
     </div>
-    <div class="field">
-      <label for="loginMarketId">PW</label>
-      <input id="loginMarketId" type="password" placeholder="PW" autocomplete="off">
-    </div>
-    <button class="btn btn-primary" id="loginBtn">로그인</button>
-    <div class="login-error" id="loginError"></div>
-    <div class="login-foot">
-      <button class="link-btn" id="openSettingsFromLogin">관리자 설정</button>
+    <div class="lv-foot">Performance Reporting Dashboard</div>
+  </div>
+  <div class="login-form-wrap">
+    <div class="login-card">
+      <h1>로그인</h1>
+      <p class="sub">발급받은 ID와 PW로 로그인해주세요.</p>
+      <div class="field">
+        <label for="loginPhone">ID</label>
+        <input id="loginPhone" type="text" placeholder="ID" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="loginMarketId">PW</label>
+        <input id="loginMarketId" type="password" placeholder="PW" autocomplete="off">
+      </div>
+      <button class="btn btn-primary" id="loginBtn">로그인</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-foot">
+        <button class="link-btn" id="openSettingsFromLogin">관리자 설정</button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ===================== DASHBOARD ===================== -->
 <div id="dashboard">
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="dot"></span>
-      <span class="topbar-title">협력광고 리포트</span>
-      <span class="topbar-sub" id="topbarUpdated"></span>
-    </div>
-    <div class="topbar-right">
-      <button class="icon-btn" id="exportBtn" title="엑셀 내보내기">⭳</button>
-      <button class="icon-btn" id="settingsBtn" title="설정">⚙</button>
-      <button class="icon-btn" id="logoutBtn" title="로그아웃">⏻</button>
-    </div>
-  </div>
+  <div class="app-shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span class="mark">R</span><span class="name">협력광고 리포트</span></div>
 
-  <div class="container">
-    <!-- 캠페인 브리프 -->
-    <div class="brief">
-      <div class="brief-top">
-        <div class="brief-brand" id="briefBrand">-</div>
-        <div class="brief-period-wrap">
-          <div class="brief-period" id="briefPeriod">-</div>
-          <div class="progress-wrap mini">
-            <div class="progress-bar"><div class="progress-fill" id="briefDayBar" style="width:0%; background:var(--ink-faint);"></div></div>
-            <div class="progress-label" id="briefDayLabel">진행률 0%</div>
+      <div class="sidebar-brief">
+        <div class="sb-name" id="sbBrand">-</div>
+        <div class="sb-period" id="sbPeriod">-</div>
+        <div class="sb-bar"><i id="sbDayBar" style="width:0%"></i></div>
+        <div class="sb-label" id="sbDayLabel">진행률 0%</div>
+      </div>
+
+      <div class="sidebar-section-label">보기</div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <button class="nav-item active" data-view="overview">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+          Overview
+        </button>
+        <button class="nav-item" data-view="trends">
+          <svg viewBox="0 0 24 24"><polyline points="3,17 9,11 13,15 21,6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15,6 21,6 21,12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Trends
+        </button>
+        <button class="nav-item" data-view="creative">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><polyline points="3,17 9,12 13,15 21,9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Creative
+        </button>
+        <button class="nav-item" data-view="objectives">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+          Objectives
+        </button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-foot">
+        <button class="nav-item" id="themeToggleBtn"><span id="themeIcon">☀</span> <span id="themeLabel">테마</span></button>
+        <button class="nav-item" id="exportBtn">⭳ 엑셀 내보내기</button>
+        <button class="nav-item" id="settingsBtn">⚙ 설정</button>
+        <button class="nav-item" id="logoutBtn">⏻ 로그아웃</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="mobile-topbar">
+        <button class="icon-btn" id="mobileMenuBtn">☰</button>
+        <span class="name" id="mobileBrandName">협력광고 리포트</span>
+      </div>
+
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-crumb" id="topbarCrumb">Overview</span>
+          <span class="topbar-title" id="topbarTitle">전체 성과 요약</span>
+        </div>
+        <div class="topbar-right">
+          <span class="topbar-updated" id="topbarUpdated"></span>
+          <button class="icon-btn hamburger" id="hamburgerBtn">☰</button>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ============ OVERVIEW ============ -->
+        <div class="view active" id="view-overview">
+          <div class="hero">
+            <div class="hero-top">
+              <div>
+                <div class="hero-brand" id="briefBrand">-<span class="badge" id="heroBudgetTag">예산 -</span></div>
+                <div class="hero-period" id="briefPeriod">-</div>
+              </div>
+              <div class="hero-progress">
+                <div class="label" id="briefDayLabel">진행률 0%</div>
+                <div class="hero-bar"><i id="briefDayBar" style="width:0%"></i></div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="brief-grid">
-        <div class="brief-stat">
-          <div class="k">총 예산 (VAT 포함)</div>
-          <div class="v" id="briefBudget">-</div>
-        </div>
-        <div class="brief-stat">
-          <div class="k">누적 지출</div>
-          <div class="v" id="briefSpend">-</div>
-          <div class="progress-wrap">
-            <div class="progress-bar"><div class="progress-fill" id="briefBudgetBar" style="width:0%"></div></div>
-            <div class="progress-label" id="briefBudgetLabel">예산 소진율 0%</div>
+
+          <div class="kpi-grid" id="kpiGrid"></div>
+
+          <div class="insight">
+            <span class="tag">DATA</span>
+            <ul id="insightList"><li>데이터를 불러오는 중입니다…</li></ul>
           </div>
+
+          <div class="section-head"><h2>구매 퍼널</h2><span class="hint">노출 → 클릭 → 장바구니 담기 → 구매</span></div>
+          <div class="card" id="funnelCard"></div>
+
+          <div class="section-head"><h2>전일 · 전주 비교</h2><span class="hint">방향만 표시 (증감의 좋고 나쁨은 판단하지 않음)</span></div>
+          <div class="compare-grid" id="compareGrid"></div>
         </div>
-        <div class="brief-stat">
-          <div class="k">총 매출 (구매전환값)</div>
-          <div class="v" id="briefRevenue">-</div>
+
+        <!-- ============ TRENDS ============ -->
+        <div class="view" id="view-trends">
+          <div class="card">
+            <div class="card-head">
+              <h3>일간 추이</h3>
+              <div class="pill-row" id="metricPillRow"></div>
+            </div>
+            <div class="chart-box tall"><canvas id="dailyChart"></canvas></div>
+          </div>
+
+          <div class="section-head"><h2>Weekly</h2></div>
+          <div class="card"><div class="table-scroll" id="weeklyTableWrap"></div></div>
+
+          <div class="section-head"><h2>Daily</h2></div>
+          <div class="card"><div class="table-scroll" id="dailyTableWrap"></div></div>
         </div>
-        <div class="brief-stat">
-          <div class="k">ROAS</div>
-          <div class="v" id="briefRoas">-</div>
+
+        <!-- ============ CREATIVE ============ -->
+        <div class="view" id="view-creative">
+          <div class="best-grid" id="bestCreativeGrid"></div>
+
+          <div class="section-head"><h2>소재 포지셔닝</h2><span class="hint">가로: CTR · 세로: ROAS · 원 크기: 광고비</span></div>
+          <div class="card"><div class="chart-box tall"><canvas id="creativeScatter"></canvas></div></div>
+
+          <div class="section-head"><h2>소재별 성과</h2></div>
+          <div class="card"><div class="table-scroll" id="creativeTableWrap"></div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- 인사이트 -->
-    <div class="insight">
-      <span class="tag">DATA</span>
-      <ul id="insightList"><li>데이터를 불러오는 중입니다…</li></ul>
-    </div>
+        <!-- ============ OBJECTIVES ============ -->
+        <div class="view" id="view-objectives">
+          <div class="card">
+            <div class="card-head"><h3>목적별 광고비 비중</h3></div>
+            <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+              <div class="chart-box" style="width:220px; height:220px; flex-shrink:0;"><canvas id="objectiveDonut"></canvas></div>
+              <div id="objectiveLegend" style="flex:1; min-width:180px; display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+          </div>
 
-    <!-- 탭 -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="summary">Summary</button>
-      <button class="tab-btn" data-tab="bydate">날짜별</button>
-    </div>
+          <div class="section-head"><h2>목적별 성과</h2></div>
+          <div class="card"><div class="table-scroll" id="objectiveTableWrap"></div></div>
 
-    <!-- Summary -->
-    <div class="tab-panel active" id="panel-summary">
-      <div class="card">
-        <div class="card-head"><h3>전체 기간 총계</h3></div>
-        <div class="table-scroll" id="summaryTableWrap"></div>
-      </div>
+          <div class="section-head"><h2>전체 기간 총계</h2></div>
+          <div class="card"><div class="table-scroll" id="summaryTableWrap"></div></div>
+        </div>
 
-      <div class="compare-grid" id="compareGrid"></div>
-
-      <div class="card">
-        <div class="card-head"><h3>목적(Objective)별 성과</h3></div>
-        <div class="table-scroll" id="objectiveTableWrap"></div>
-      </div>
-
-      <div class="best-grid" id="bestCreativeGrid"></div>
-      <div class="card">
-        <div class="card-head"><h3>소재별 성과</h3></div>
-        <div class="table-scroll" id="creativeTableWrap"></div>
-      </div>
-    </div>
-
-    <!-- 날짜별 -->
-    <div class="tab-panel" id="panel-bydate">
-      <div class="card">
-        <div class="card-head"><h3>일간 추이</h3><span class="hint">막대: 구매전환값 · 선: 구매</span></div>
-        <div class="chart-box"><canvas id="dailyChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Weekly</h3></div>
-        <div class="table-scroll" id="weeklyTableWrap"></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Daily</h3></div>
-        <div class="table-scroll" id="dailyTableWrap"></div>
       </div>
     </div>
   </div>
@@ -434,6 +650,7 @@
 =============================================================*/
 const LS_KEY = "ably_dashboard_settings_v1";
 const SESSION_KEY = "ably_dashboard_session_v1";
+const THEME_KEY = "ably_dashboard_theme_v1";
 
 // 기본값: 코드에 직접 심어둔 값. 모든 방문자 브라우저에서 동일하게 적용됨.
 // 설정 화면에서 값을 바꾸면 "그 브라우저에서만" 아래 기본값을 덮어씀 (관리자 테스트용).
@@ -468,7 +685,6 @@ function loadSession(){
 }
 function saveSession(s){ sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
 function clearSession(){ sessionStorage.removeItem(SESSION_KEY); }
-
 
 let settings = loadSettings();
 let session = loadSession();
@@ -529,7 +745,6 @@ function toNumber(v){
 function parseDateLoose(v){
   if(!v) return null;
   v = String(v).trim();
-  // serial number (google sheets/excel)
   if(/^\d{4,6}$/.test(v)){
     const epoch = new Date(Date.UTC(1899,11,30));
     const d = new Date(epoch.getTime() + parseInt(v,10)*86400000);
@@ -547,8 +762,6 @@ function fmtShort(d){
 }
 function parsePeriod(v){
   if(!v) return null;
-  const parts = String(v).split(/[~\-–]{1}(?=\s*\d{4}|\s*20)/);
-  // fallback: split on ~ specifically first
   let raw = String(v).split("~");
   if(raw.length!==2) raw = String(v).split(" - ");
   if(raw.length!==2) return null;
@@ -601,9 +814,6 @@ async function attemptLogin(phone, marketId){
 /* ============================================================
    4. Data loading + brand filter
 =============================================================*/
-// 데이터 시트 헤더명이 매번 조금씩 달라질 수 있어, 저장된 매핑 대신
-// 로그인 시트와 동일하게 헤더 문자열에서 키워드를 찾아 매번 자동으로 인식한다.
-// 이렇게 하면 코드/기본 설정만 맞으면 어떤 브라우저에서 열어도 동일하게 동작한다.
 function detectDataColumns(headers){
   const has = (h, arr) => arr.some(k => h.includes(k));
   const find = (yes, no) => headers.find(h => has(h, yes) && !(no && has(h, no)));
@@ -720,13 +930,10 @@ function buildWeeklySeries(dailySeries, execStart){
   if(!dailySeries.length) return [];
   const weeks = [];
   let i = 0;
-  // first bucket: execStart -> following Saturday (or dataset start if execStart missing)
-  const anchor = execStart || dailySeries[0].date;
   while(i < dailySeries.length){
     const bucketStartDate = dailySeries[i].date;
     let bucketEnd;
     if(weeks.length===0){
-      // end at nearest Saturday (day 6)
       const dow = bucketStartDate.getDay();
       bucketEnd = addDays(bucketStartDate, 6-dow);
     } else {
@@ -752,6 +959,12 @@ function won(n){ return "₩" + nf.format(Math.round(n)); }
 function num(n){ return nf.format(Math.round(n)); }
 function pct(n){ return (n*100).toFixed(2) + "%"; }
 function ratio(n){ return n.toFixed(2); }
+function compact(n){
+  n = Math.round(n);
+  if(Math.abs(n) >= 1e8) return (n/1e8).toFixed(1)+"억";
+  if(Math.abs(n) >= 1e4) return (n/1e4).toFixed(1)+"만";
+  return nf.format(n);
+}
 
 const METRIC_COLS = [
   {k:"cost", label:"광고비", fmt:won},
@@ -768,55 +981,81 @@ const METRIC_COLS = [
   {k:"roas", label:"ROAS", fmt:ratio}
 ];
 
+/* ============================================================
+   7. Sortable tables
+=============================================================*/
+const tableSortState = {};
 function renderMetricTable(container, rows, labelFn, isTotalFn){
   if(!rows.length){
     container.innerHTML = '<div class="empty-note">표시할 데이터가 없어요.</div>';
     return;
   }
-  let html = "<table><thead><tr><th>" +
-    (rows.length ? "구분" : "") + "</th>" +
-    METRIC_COLS.map(c=>`<th>${c.label}</th>`).join("") + "</tr></thead><tbody>";
-  rows.forEach((r,idx)=>{
-    const cls = isTotalFn && isTotalFn(r,idx) ? "total-row" : "";
-    html += `<tr class="${cls}"><td>${labelFn(r,idx)}</td>` +
-      METRIC_COLS.map(c=>`<td>${r.agg ? c.fmt(r.agg[c.k]) : c.fmt(r[c.k])}</td>`).join("") + "</tr>";
+  const normalAll = [], totalAll = [];
+  rows.forEach((r,idx)=>{ (isTotalFn && isTotalFn(r,idx) ? totalAll : normalAll).push(r); });
+
+  const st = tableSortState[container.id] || (tableSortState[container.id] = {key:null, dir:-1});
+  let normal = normalAll;
+  if(st.key){
+    normal = normalAll.slice().sort((a,b)=>{
+      if(st.key === "__label"){
+        return st.dir * String(labelFn(a)).localeCompare(String(labelFn(b)), "ko");
+      }
+      const av = a.agg ? a.agg[st.key] : a[st.key];
+      const bv = b.agg ? b.agg[st.key] : b[st.key];
+      return st.dir * (av - bv);
+    });
+  }
+
+  const cols = [{k:"__label", label:"구분"}].concat(METRIC_COLS);
+  let html = "<table><thead><tr>" + cols.map(c=>{
+    const active = st.key === c.k;
+    const arrow = active ? (st.dir===1 ? " ▲" : " ▼") : "";
+    return `<th class="sortable${active?' sorted':''}" data-key="${c.k}">${c.label}${arrow}</th>`;
+  }).join("") + "</tr></thead><tbody>";
+  normal.forEach(r=>{
+    html += `<tr><td>${labelFn(r)}</td>` + METRIC_COLS.map(c=>`<td>${r.agg ? c.fmt(r.agg[c.k]) : c.fmt(r[c.k])}</td>`).join("") + "</tr>";
+  });
+  totalAll.forEach(r=>{
+    html += `<tr class="total-row"><td>${labelFn(r)}</td>` + METRIC_COLS.map(c=>`<td>${r.agg ? c.fmt(r.agg[c.k]) : c.fmt(r[c.k])}</td>`).join("") + "</tr>";
   });
   html += "</tbody></table>";
   container.innerHTML = html;
-}
 
-/* ============================================================
-   7. Charts
-=============================================================*/
-function renderTimeChart(canvasId, series, labelFn, existingRef){
-  const el = document.getElementById(canvasId);
-  if(!el) return;
-  const ctx = el.getContext("2d");
-  if(existingRef.current) existingRef.current.destroy();
-  existingRef.current = new Chart(ctx, {
-    data:{
-      labels: series.map(labelFn),
-      datasets:[
-        {type:"bar", label:"구매전환값", data:series.map(s=>Math.round(s.agg.revenue)), backgroundColor:"#16171A", yAxisID:"y", borderRadius:4, maxBarThickness:28},
-        {type:"line", label:"구매", data:series.map(s=>s.agg.purchases), borderColor:"#FF4757", backgroundColor:"#FF4757", yAxisID:"y1", tension:.3, pointRadius:3}
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{mode:"index", intersect:false},
-      plugins:{legend:{display:true, labels:{boxWidth:10, font:{size:11}}}},
-      scales:{
-        y:{position:"left", grid:{color:"#F1EFE9"}, ticks:{callback:v=>nf.format(v), font:{size:10}}},
-        y1:{position:"right", grid:{display:false}, ticks:{font:{size:10}}},
-        x:{grid:{display:false}, ticks:{font:{size:10}}}
-      }
-    }
+  container.querySelectorAll("th.sortable").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.dataset.key;
+      if(st.key === key) st.dir *= -1;
+      else { st.key = key; st.dir = key === "__label" ? 1 : -1; }
+      renderMetricTable(container, rows, labelFn, isTotalFn);
+    });
   });
 }
-const dailyChartRef={current:null};
 
 /* ============================================================
-   7b. DoD / WoW comparison (direction-only, no value judgment)
+   8. Sparklines (inline SVG, no chart lib overhead)
+=============================================================*/
+function sparklineSVG(values){
+  if(!values || values.length < 2) return "";
+  const w=100, h=30, pad=2;
+  const max = Math.max.apply(null, values), min = Math.min.apply(null, values);
+  const range = (max - min) || 1;
+  const pts = values.map((v,i)=>{
+    const x = pad + i*(w-2*pad)/(values.length-1);
+    const y = h-pad - ((v-min)/range)*(h-2*pad);
+    return [x,y];
+  });
+  const lineStr = pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const areaStr = `${pad},${h-pad} ${lineStr} ${(w-pad).toFixed(1)},${h-pad}`;
+  const last = pts[pts.length-1];
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <polygon points="${areaStr}" class="spark-area"></polygon>
+    <polyline points="${lineStr}" class="spark-line"></polyline>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.3" class="spark-dot"></circle>
+  </svg>`;
+}
+
+/* ============================================================
+   9. DoD / WoW comparison (direction-only, no value judgment)
 =============================================================*/
 const COMPARE_METRICS = [
   {k:"cost", label:"광고비", fmt:won},
@@ -829,20 +1068,19 @@ function deltaPct(cur, prev){
   if(!prev) return cur ? null : 0;
   return (cur-prev)/prev*100;
 }
+function deltaBadge(d, fallbackText){
+  if(d === null) return `<span class="delta up">▲ ${fallbackText}</span>`;
+  if(d > 0.05) return `<span class="delta up">▲ ${d.toFixed(1)}%</span>`;
+  if(d < -0.05) return `<span class="delta down">▼ ${Math.abs(d).toFixed(1)}%</span>`;
+  return `<span class="delta flat">– 0.0%</span>`;
+}
 function renderCompareRows(cur, prev){
   return COMPARE_METRICS.map(m=>{
     const c = cur[m.k], p = prev[m.k];
     const d = deltaPct(c, p);
-    let cls = "flat", arrow = "–", text = "0.0%";
-    if(d === null){
-      // 전일 값이 0이면 배수(%) 계산이 성립하지 않으므로, 대신 늘어난 절대량을 보여준다.
-      cls = "up"; arrow = "▲"; text = "+" + m.fmt(c);
-    } else if(d > 0.05){ cls="up"; arrow="▲"; text = d.toFixed(1) + "%"; }
-    else if(d < -0.05){ cls="down"; arrow="▼"; text = Math.abs(d).toFixed(1) + "%"; }
-    else { text = "0.0%"; }
     return `<div class="compare-row">
       <span class="m-label">${m.label}</span>
-      <span><span class="m-val">${m.fmt(c)}</span><span class="m-delta ${cls}">${arrow} ${text}</span></span>
+      <span><span class="m-val">${m.fmt(c)}</span>${deltaBadge(d, "+"+m.fmt(c))}</span>
     </div>`;
   }).join("");
 }
@@ -855,12 +1093,8 @@ function findLastActiveIndex(dailySeries){
 function renderComparisonCards(dailySeries, weeklySeries){
   const wrap = document.getElementById("compareGrid");
   let html = "";
-  // 마지막으로 실제 데이터(노출 또는 지출)가 찍힌 날을 기준으로 비교한다.
-  // 최근 1~2일은 매체 리포팅 지연으로 0이 찍혀있는 경우가 많아, 그 날짜를 그대로 쓰면
-  // "전일 대비 0%"처럼 실제 성과와 무관한 값이 나올 수 있기 때문.
   const lastActive = findLastActiveIndex(dailySeries);
 
-  // 전일 대비
   if(lastActive >= 1){
     const cur = dailySeries[lastActive];
     const prev = dailySeries[lastActive-1];
@@ -873,7 +1107,6 @@ function renderComparisonCards(dailySeries, weeklySeries){
     html += `<div class="compare-card"><h4>전일 대비</h4><div class="empty-note">비교할 데이터가 아직 없어요.</div></div>`;
   }
 
-  // 전주 대비 (마지막 활동일 기준 최근 7일 vs 그 이전 7일)
   if(lastActive >= 13){
     const last7 = dailySeries.slice(lastActive-6, lastActive+1);
     const prev7 = dailySeries.slice(lastActive-13, lastActive-6);
@@ -898,7 +1131,7 @@ function renderComparisonCards(dailySeries, weeklySeries){
 }
 
 /* ============================================================
-   8. Insights (data-only, no action recommendations)
+   10. Insights (data-only, no action recommendations)
 =============================================================*/
 function buildInsights(dailySeries, weeklySeries, agg, budget, execStart, execEnd){
   const items = [];
@@ -912,7 +1145,8 @@ function buildInsights(dailySeries, weeklySeries, agg, budget, execStart, execEn
     items.push(`예산 소진율 ${pct(agg.cost/budget)} (누적 지출 ${won(agg.cost)} / 총 예산 ${won(budget)})`);
   }
   if(dailySeries.length){
-    const top = dailySeries.slice(-7).reduce((a,b)=> b.agg.cost>a.agg.cost?b:a, dailySeries.slice(-7)[0] || dailySeries[dailySeries.length-1]);
+    const recent = dailySeries.slice(-7);
+    const top = recent.reduce((a,b)=> b.agg.cost>a.agg.cost?b:a, recent[0] || dailySeries[dailySeries.length-1]);
     items.push(`최근 7일 중 지출 최고일: ${fmtShort(top.date)} (${won(top.agg.cost)})`);
   }
   if(!items.length) items.push("특이사항 없음");
@@ -920,20 +1154,325 @@ function buildInsights(dailySeries, weeklySeries, agg, budget, execStart, execEn
 }
 
 /* ============================================================
-   9. Render dashboard for current session
+   11. Charts
 =============================================================*/
-let currentState = {}; // holds computed data for export
+Chart.defaults.font.family = "'Pretendard', sans-serif";
+Chart.defaults.color = getCssVar("--text-muted");
+function getCssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+const chartRefs = {};
+function destroyChart(key){ if(chartRefs[key]){ chartRefs[key].destroy(); chartRefs[key]=null; } }
+
+const METRIC_OPTIONS = [
+  {k:"revenue", label:"구매전환값", fmt:won, kind:"bar"},
+  {k:"cost", label:"광고비", fmt:won, kind:"bar"},
+  {k:"purchases", label:"구매", fmt:num, kind:"line"},
+  {k:"clicks", label:"클릭", fmt:num, kind:"line"},
+  {k:"impressions", label:"노출", fmt:num, kind:"line"},
+  {k:"roas", label:"ROAS", fmt:ratio, kind:"line"}
+];
+let currentTrendMetric = "revenue";
+
+function renderMetricPills(){
+  const wrap = document.getElementById("metricPillRow");
+  wrap.innerHTML = METRIC_OPTIONS.map(m=>
+    `<button class="pill${m.k===currentTrendMetric?' active':''}" data-metric="${m.k}">${m.label}</button>`
+  ).join("");
+  wrap.querySelectorAll(".pill").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      currentTrendMetric = btn.dataset.metric;
+      wrap.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      renderTrendChart();
+    });
+  });
+}
+
+function renderTrendChart(){
+  const series = currentState.dailySeries || [];
+  const el = document.getElementById("dailyChart");
+  if(!el || !series.length) return;
+  const opt = METRIC_OPTIONS.find(m=>m.k===currentTrendMetric);
+  const grid = getCssVar("--grid");
+  const muted = getCssVar("--text-muted");
+  const seriesColor = getCssVar("--series-1");
+  destroyChart("daily");
+  chartRefs.daily = new Chart(el.getContext("2d"), {
+    type: opt.kind,
+    data:{
+      labels: series.map(s=>fmtShort(s.date)),
+      datasets:[{
+        label: opt.label,
+        data: series.map(s=>s.agg[opt.k]),
+        backgroundColor: opt.kind==="bar" ? seriesColor : colorWithAlpha(seriesColor,.12),
+        borderColor: seriesColor,
+        borderWidth: 2,
+        borderRadius: opt.kind==="bar" ? 4 : 0,
+        maxBarThickness: 24,
+        fill: opt.kind==="line",
+        tension:.3,
+        pointRadius: opt.kind==="line" ? 2 : 0,
+        pointBackgroundColor: seriesColor
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:"index", intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{ label: ctx => opt.label+": "+opt.fmt(ctx.parsed.y) }}
+      },
+      scales:{
+        y:{ grid:{color:grid, drawTicks:false}, border:{display:false}, ticks:{callback:v=>compact(v), font:{size:10.5}, color:muted} },
+        x:{ grid:{display:false}, border:{color:getCssVar("--baseline")}, ticks:{font:{size:10.5}, color:muted, maxRotation:0, autoSkip:true} }
+      }
+    }
+  });
+}
+
+function renderFunnel(agg){
+  const stages = [
+    {label:"노출", value: agg.impressions, color: getCssVar("--seq-250")},
+    {label:"클릭", value: agg.clicks, color: getCssVar("--seq-350")},
+    {label:"장바구니", value: agg.cart, color: getCssVar("--seq-450")},
+    {label:"구매", value: agg.purchases, color: getCssVar("--seq-600")}
+  ];
+  const max = stages[0].value || 1;
+  let html = "";
+  stages.forEach((s,i)=>{
+    const w = Math.max((s.value/max)*100, s.value>0 ? 2 : 0);
+    html += `<div class="funnel-row">
+      <div class="funnel-label">${s.label}</div>
+      <div class="funnel-track"><div class="funnel-bar" style="width:${w}%; background:${s.color}"></div></div>
+      <div class="funnel-value">${num(s.value)}</div>
+    </div>`;
+    if(i < stages.length-1){
+      const next = stages[i+1];
+      const rate = s.value ? (next.value/s.value*100) : 0;
+      html += `<div class="funnel-rate">전환율 ${rate.toFixed(2)}% (${s.label} → ${next.label})</div>`;
+    }
+  });
+  document.getElementById("funnelCard").innerHTML = html;
+}
+
+function renderCreativeScatter(creativeRows){
+  const el = document.getElementById("creativeScatter");
+  if(!el) return;
+  destroyChart("scatter");
+  const grid = getCssVar("--grid");
+  const muted = getCssVar("--text-muted");
+  const seriesColor = getCssVar("--series-1");
+  const maxCost = Math.max.apply(null, creativeRows.map(c=>c.cost)) || 1;
+  const points = creativeRows.filter(c=>c.cost>0).map(c=>({
+    x: c.ctr*100, y: c.roas, r: Math.max(5, Math.sqrt(c.cost/maxCost)*26), name: c.name, cost: c.cost
+  }));
+  if(!points.length){ el.parentElement.innerHTML = '<div class="empty-note">표시할 데이터가 없어요.</div>'; return; }
+  chartRefs.scatter = new Chart(el.getContext("2d"), {
+    type:"bubble",
+    data:{ datasets:[{ label:"소재", data: points, backgroundColor: colorWithAlpha(seriesColor,.35), borderColor: seriesColor, borderWidth:1.5 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{ callbacks:{ label: ctx => {
+          const p = ctx.raw;
+          return [p.name, `CTR ${p.x.toFixed(2)}%`, `ROAS ${p.y.toFixed(2)}`, `광고비 ${won(p.cost)}`];
+        }}}
+      },
+      scales:{
+        x:{ title:{display:true, text:"CTR (%)", color:muted, font:{size:11}}, grid:{color:grid}, border:{color:getCssVar("--baseline")}, ticks:{color:muted, font:{size:10.5}} },
+        y:{ title:{display:true, text:"ROAS", color:muted, font:{size:11}}, grid:{color:grid}, border:{display:false}, ticks:{color:muted, font:{size:10.5}} }
+      }
+    }
+  });
+}
+
+function colorWithAlpha(hex, alpha){
+  const h = hex.replace("#","");
+  const bigint = parseInt(h.length===3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  const r=(bigint>>16)&255, g=(bigint>>8)&255, b=bigint&255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function renderObjectiveDonut(objectiveRows, totalAgg){
+  const el = document.getElementById("objectiveDonut");
+  const legendWrap = document.getElementById("objectiveLegend");
+  if(!el) return;
+  destroyChart("donut");
+  if(!objectiveRows.length){
+    el.parentElement.innerHTML = '<div class="empty-note">표시할 데이터가 없어요.</div>';
+    legendWrap.innerHTML = "";
+    return;
+  }
+  const sorted = objectiveRows.slice().sort((a,b)=>b.cost-a.cost);
+  const CAP = 5;
+  const top = sorted.slice(0, CAP);
+  const rest = sorted.slice(CAP);
+  const restCost = rest.reduce((a,r)=>a+r.cost, 0);
+  const slices = top.slice();
+  if(rest.length) slices.push({name:"기타", cost:restCost});
+  const palette = [
+    getCssVar("--series-1"), getCssVar("--series-2"), getCssVar("--series-3"),
+    getCssVar("--series-4"), getCssVar("--series-5"), getCssVar("--text-muted")
+  ];
+  const surface = getCssVar("--surface");
+  chartRefs.donut = new Chart(el.getContext("2d"), {
+    type:"doughnut",
+    data:{
+      labels: slices.map(s=>s.name),
+      datasets:[{ data: slices.map(s=>s.cost), backgroundColor: palette.slice(0,slices.length), borderColor: surface, borderWidth:3 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:"64%",
+      plugins:{
+        legend:{display:false},
+        tooltip:{ callbacks:{ label: ctx => `${ctx.label}: ${won(ctx.parsed)} (${(ctx.parsed/totalAgg.cost*100).toFixed(1)}%)` } }
+      }
+    }
+  });
+  legendWrap.innerHTML = slices.map((s,i)=>{
+    const share = totalAgg.cost ? (s.cost/totalAgg.cost*100) : 0;
+    return `<div style="display:flex; align-items:center; gap:8px; font-size:12.5px;">
+      <span style="width:10px;height:10px;border-radius:3px;background:${palette[i]};flex-shrink:0;"></span>
+      <span style="flex:1; color:var(--text-secondary);">${s.name}</span>
+      <span style="font-family:var(--mono); font-weight:700;">${share.toFixed(1)}%</span>
+    </div>`;
+  }).join("");
+}
+
+/* ============================================================
+   12. KPI tiles
+=============================================================*/
+function buildKPIGrid(totalAgg, dailySeries, session){
+  const lastActive = findLastActiveIndex(dailySeries);
+  const cur = lastActive >= 0 ? dailySeries[lastActive].agg : null;
+  const prev = lastActive >= 1 ? dailySeries[lastActive-1].agg : null;
+  const last12 = dailySeries.slice(Math.max(0, dailySeries.length-12));
+
+  const budgetPct = session.budget ? Math.min(totalAgg.cost/session.budget,1)*100 : 0;
+
+  const tiles = [];
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">총 예산 (VAT 포함)</span></div>
+      <div class="kpi-value">${won(session.budget||0)}</div>
+      <div class="kpi-foot"><div class="kpi-sub">전체 캠페인 계약 예산</div></div>
+    </div>`);
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">누적 지출</span>${cur&&prev?deltaBadge(deltaPct(cur.cost,prev.cost),"+"+won(cur.cost)):""}</div>
+      <div class="kpi-value">${won(totalAgg.cost)}</div>
+      <div class="kpi-foot">
+        <div class="meter-track"><i style="width:${budgetPct}%"></i></div>
+        <div class="meter-label">예산 소진율 ${session.budget?pct(totalAgg.cost/session.budget):"-"}</div>
+      </div>
+    </div>`);
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">총 매출 (구매전환값)</span>${cur&&prev?deltaBadge(deltaPct(cur.revenue,prev.revenue),"+"+won(cur.revenue)):""}</div>
+      <div class="kpi-value">${won(totalAgg.revenue)}</div>
+      <div class="kpi-foot">${sparklineSVG(last12.map(d=>d.agg.revenue))}</div>
+    </div>`);
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">ROAS</span>${cur&&prev?deltaBadge(deltaPct(cur.roas,prev.roas),"+"+ratio(cur.roas)):""}</div>
+      <div class="kpi-value">${ratio(totalAgg.roas)}</div>
+      <div class="kpi-foot">${sparklineSVG(last12.map(d=>d.agg.roas))}</div>
+    </div>`);
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">CTR</span>${cur&&prev?deltaBadge(deltaPct(cur.ctr,prev.ctr),"+"+pct(cur.ctr)):""}</div>
+      <div class="kpi-value">${pct(totalAgg.ctr)}</div>
+      <div class="kpi-foot"><div class="kpi-sub">클릭 ${num(totalAgg.clicks)} / 노출 ${num(totalAgg.impressions)}</div></div>
+    </div>`);
+
+  tiles.push(`
+    <div class="kpi-tile">
+      <div class="kpi-top"><span class="kpi-label">CPA (구매)</span>${cur&&prev?deltaBadge(deltaPct(cur.cpa,prev.cpa),"+"+won(cur.cpa)):""}</div>
+      <div class="kpi-value">${totalAgg.purchases ? won(totalAgg.cpa) : "-"}</div>
+      <div class="kpi-foot"><div class="kpi-sub">구매 ${num(totalAgg.purchases)}건</div></div>
+    </div>`);
+
+  document.getElementById("kpiGrid").innerHTML = tiles.join("");
+}
+
+/* ============================================================
+   13. View / navigation
+=============================================================*/
+const VIEW_META = {
+  overview:   {crumb:"Overview",   title:"전체 성과 요약"},
+  trends:     {crumb:"Trends",     title:"일자별 추이"},
+  creative:   {crumb:"Creative",   title:"소재 성과"},
+  objectives: {crumb:"Objectives", title:"목적별 성과"}
+};
+function switchView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-"+name).classList.add("active");
+  document.querySelectorAll(".nav-item[data-view]").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
+  document.getElementById("topbarCrumb").textContent = VIEW_META[name].crumb;
+  document.getElementById("topbarTitle").textContent = VIEW_META[name].title;
+  closeSidebarMobile();
+  if(name==="trends") renderTrendChart();
+  if(name==="creative" && currentState.creativeRows) renderCreativeScatter(currentState.creativeRows);
+  if(name==="objectives" && currentState.rows) renderObjectiveDonut(groupByObjective(currentState.rows), currentState.totalAgg);
+}
+document.querySelectorAll(".nav-item[data-view]").forEach(btn=>{
+  btn.addEventListener("click", ()=>switchView(btn.dataset.view));
+});
+
+/* mobile sidebar */
+const sidebarEl = document.getElementById("sidebar");
+const backdropEl = document.getElementById("sidebarBackdrop");
+function openSidebarMobile(){ sidebarEl.classList.add("open"); backdropEl.classList.add("show"); }
+function closeSidebarMobile(){ sidebarEl.classList.remove("open"); backdropEl.classList.remove("show"); }
+document.getElementById("mobileMenuBtn").addEventListener("click", openSidebarMobile);
+document.getElementById("hamburgerBtn").addEventListener("click", openSidebarMobile);
+backdropEl.addEventListener("click", closeSidebarMobile);
+
+/* theme toggle */
+function applyTheme(t){
+  if(t){ document.documentElement.setAttribute("data-theme", t); }
+  else { document.documentElement.removeAttribute("data-theme"); }
+  const isDark = t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  document.getElementById("themeIcon").textContent = isDark ? "☾" : "☀";
+  Chart.defaults.color = getCssVar("--text-muted");
+  if(session) rerenderAllCharts();
+}
+document.getElementById("themeToggleBtn").addEventListener("click", ()=>{
+  const cur = localStorage.getItem(THEME_KEY);
+  const next = cur === "dark" ? "light" : (cur === "light" ? null : "dark");
+  if(next) localStorage.setItem(THEME_KEY, next); else localStorage.removeItem(THEME_KEY);
+  applyTheme(next);
+});
+function rerenderAllCharts(){
+  if(currentState.dailySeries) renderTrendChart();
+  if(document.getElementById("view-creative").classList.contains("active") && currentState.creativeRows) renderCreativeScatter(currentState.creativeRows);
+  if(document.getElementById("view-objectives").classList.contains("active") && currentState.rows) renderObjectiveDonut(groupByObjective(currentState.rows), currentState.totalAgg);
+}
+applyTheme(localStorage.getItem(THEME_KEY));
+
+/* ============================================================
+   14. Render dashboard for current session
+=============================================================*/
+let currentState = {};
 
 async function renderDashboardForSession(){
-  document.getElementById("briefBrand").textContent = session.brand;
+  document.getElementById("briefBrand").innerHTML = escapeHtml(session.brand) + '<span class="badge" id="heroBudgetTag">예산 ' + won(session.budget||0) + '</span>';
+  document.getElementById("sbBrand").textContent = session.brand;
+  document.getElementById("mobileBrandName").textContent = session.brand;
   const period = parsePeriod(session.periodRaw);
   document.getElementById("briefPeriod").textContent = session.periodRaw || "-";
-  document.getElementById("briefBudget").textContent = won(session.budget||0);
+  document.getElementById("sbPeriod").textContent = session.periodRaw || "-";
 
   try{
     if(!rawDataCache) await loadRawData();
   }catch(e){
-    document.getElementById("insightList").innerHTML = `<li>성과 데이터를 불러오지 못했어요: ${e.message}</li>`;
+    document.getElementById("insightList").innerHTML = `<li>성과 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</li>`;
     return;
   }
 
@@ -948,52 +1487,45 @@ async function renderDashboardForSession(){
 
   currentState = {rows, totalAgg, dailySeries, weeklySeries, creativeRows, execStart, execEnd};
 
-  // brief stats
-  document.getElementById("briefSpend").textContent = won(totalAgg.cost);
-  document.getElementById("briefRevenue").textContent = won(totalAgg.revenue);
-  document.getElementById("briefRoas").textContent = ratio(totalAgg.roas);
-  const spendPct = session.budget ? Math.min(totalAgg.cost/session.budget,1)*100 : 0;
-  document.getElementById("briefBudgetBar").style.width = spendPct+"%";
-  document.getElementById("briefBudgetLabel").textContent = `예산 소진율 ${session.budget ? pct(totalAgg.cost/session.budget) : "-"}`;
-
+  // day / budget progress
+  let dayPct = 0, dayLabel = "진행률 0%";
   if(execStart && execEnd){
     const today = new Date(); today.setHours(0,0,0,0);
     const totalDays = daysBetween(execStart, execEnd)+1;
     const elapsed = Math.min(Math.max(daysBetween(execStart, today)+1,0), totalDays);
-    document.getElementById("briefDayBar").style.width = (elapsed/totalDays*100)+"%";
-    document.getElementById("briefDayLabel").textContent = `진행률 ${(elapsed/totalDays*100).toFixed(0)}% (D+${elapsed}/${totalDays})`;
+    dayPct = elapsed/totalDays*100;
+    dayLabel = `진행률 ${dayPct.toFixed(0)}% (D+${elapsed}/${totalDays})`;
   }
+  document.getElementById("briefDayBar").style.width = dayPct+"%";
+  document.getElementById("briefDayLabel").textContent = dayLabel;
+  document.getElementById("sbDayBar").style.width = dayPct+"%";
+  document.getElementById("sbDayLabel").textContent = dayLabel;
 
-  // insight
   try{
     document.getElementById("insightList").innerHTML =
       buildInsights(dailySeries, weeklySeries, totalAgg, session.budget, execStart, execEnd)
         .map(t=>`<li>${t}</li>`).join("");
   }catch(e){ console.error("insight render failed", e); }
 
-  // summary table
+  try{ buildKPIGrid(totalAgg, dailySeries, session); }catch(e){ console.error("kpi render failed", e); }
+  try{ renderFunnel(totalAgg); }catch(e){ console.error("funnel render failed", e); }
+  try{ renderComparisonCards(dailySeries, weeklySeries); }catch(e){ console.error("comparison cards failed", e); }
+
   try{
-    renderMetricTable(document.getElementById("summaryTableWrap"), [{label:"전체", agg:totalAgg}], r=>r.label, ()=>true);
+    renderMetricTable(document.getElementById("summaryTableWrap"), [{name:"전체", agg:totalAgg}], r=>r.name, ()=>true);
   }catch(e){ console.error("summary table failed", e); }
 
-  // DoD / WoW comparison
-  try{
-    renderComparisonCards(dailySeries, weeklySeries);
-  }catch(e){ console.error("comparison cards failed", e); }
-
-  // objective table
   try{
     const objectiveRows = groupByObjective(rows).sort((a,b)=>b.cost-a.cost);
     renderMetricTable(document.getElementById("objectiveTableWrap"),
-      [...objectiveRows.map(o=>({label:o.name, agg:o})), {label:"총계", agg:totalAgg}],
-      r=>r.label, (r,idx)=>idx===objectiveRows.length);
+      [...objectiveRows, {name:"총계", agg:totalAgg}],
+      r=>r.name, (r,idx)=>idx===objectiveRows.length);
   }catch(e){ console.error("objective table failed", e); }
 
-  // creative table + best highlight
   try{
     renderMetricTable(document.getElementById("creativeTableWrap"),
-      [...creativeRows.map(c=>({label:c.name, agg:c})), {label:"총계", agg:totalAgg}],
-      r=>r.label, (r,idx)=>idx===creativeRows.length);
+      [...creativeRows, {name:"총계", agg:totalAgg}],
+      r=>r.name, (r,idx)=>idx===creativeRows.length);
 
     const bestGrid = document.getElementById("bestCreativeGrid");
     if(creativeRows.length > 1){
@@ -1002,12 +1534,12 @@ async function renderDashboardForSession(){
       bestGrid.innerHTML = `
         <div class="best-card">
           <div class="k">BEST ROAS</div>
-          <div class="name">${byRoas.name}</div>
+          <div class="name">${escapeHtml(byRoas.name)}</div>
           <div class="metric">${ratio(byRoas.roas)}<small>ROAS</small></div>
         </div>
         <div class="best-card">
           <div class="k">BEST CTR</div>
-          <div class="name">${byCtr.name}</div>
+          <div class="name">${escapeHtml(byCtr.name)}</div>
           <div class="metric">${pct(byCtr.ctr)}<small>CTR</small></div>
         </div>`;
     } else {
@@ -1015,29 +1547,34 @@ async function renderDashboardForSession(){
     }
   }catch(e){ console.error("creative table failed", e); }
 
-  // weekly table (날짜별 탭)
   try{
     renderMetricTable(document.getElementById("weeklyTableWrap"),
-      [...weeklySeries.map(w=>({label:`${fmtShort(w.start)}~${fmtShort(w.end)}`, agg:w.agg})), {label:"총계", agg:totalAgg}],
-      r=>r.label, (r,idx)=>idx===weeklySeries.length);
+      [...weeklySeries.map(w=>({name:`${fmtShort(w.start)}~${fmtShort(w.end)}`, agg:w.agg})), {name:"총계", agg:totalAgg}],
+      r=>r.name, (r,idx)=>idx===weeklySeries.length);
   }catch(e){ console.error("weekly table failed", e); }
 
-  // daily table + chart (날짜별 탭)
   try{
     renderMetricTable(document.getElementById("dailyTableWrap"),
-      [...dailySeries.map(d=>({label:fmtDate(d.date), agg:d.agg})), {label:"총계", agg:totalAgg}],
-      r=>r.label, (r,idx)=>idx===dailySeries.length);
+      [...dailySeries.map(d=>({name:fmtDate(d.date), agg:d.agg})), {name:"총계", agg:totalAgg}],
+      r=>r.name, (r,idx)=>idx===dailySeries.length);
   }catch(e){ console.error("daily table failed", e); }
 
   try{
-    if(dailySeries.length) renderTimeChart("dailyChart", dailySeries, d=>fmtShort(d.date), dailyChartRef);
-  }catch(e){ console.error("daily chart failed", e); }
+    renderMetricPills();
+    if(document.getElementById("view-trends").classList.contains("active")) renderTrendChart();
+  }catch(e){ console.error("trend chart failed", e); }
+  try{ if(document.getElementById("view-creative").classList.contains("active")) renderCreativeScatter(creativeRows); }catch(e){ console.error("scatter failed", e); }
+  try{ if(document.getElementById("view-objectives").classList.contains("active")) renderObjectiveDonut(groupByObjective(rows), totalAgg); }catch(e){ console.error("donut failed", e); }
 
   document.getElementById("topbarUpdated").textContent = "업데이트 " + new Date().toLocaleString("ko-KR");
 }
 
+function escapeHtml(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
 /* ============================================================
-   10. Export to Excel (SheetJS via CDN, loaded lazily)
+   15. Export to Excel (SheetJS via CDN, loaded lazily)
 =============================================================*/
 let xlsxLoaded = false;
 function ensureXLSX(){
@@ -1069,26 +1606,14 @@ async function exportExcel(){
       소재명:c.name, 광고비:Math.round(c.cost), 노출:c.impressions, 클릭:c.clicks, CTR:c.ctr, 구매:c.purchases, 구매전환값:Math.round(c.revenue), ROAS:Number(c.roas.toFixed(2))
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(creativeSheet), "Creative");
-    XLSX.writeFile(wb, `ABLY_${session.brand}_리포트_${fmtDate(new Date())}.xlsx`);
+    XLSX.writeFile(wb, `협력광고_${session.brand}_리포트_${fmtDate(new Date())}.xlsx`);
   }catch(e){
     alert("엑셀 내보내기에 실패했어요: " + e.message);
   }
 }
 
 /* ============================================================
-   11. Tabs
-=============================================================*/
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
-  });
-});
-
-/* ============================================================
-   12. Login flow
+   16. Login flow
 =============================================================*/
 document.getElementById("loginBtn").addEventListener("click", doLogin);
 [document.getElementById("loginPhone"), document.getElementById("loginMarketId")].forEach(el=>{
@@ -1101,7 +1626,7 @@ async function doLogin(){
   const errBox = document.getElementById("loginError");
   errBox.style.display = "none";
   if(!phone || !marketId){
-    errBox.textContent = "전화번호와 마켓 ID를 모두 입력해주세요.";
+    errBox.textContent = "ID와 PW를 모두 입력해주세요.";
     errBox.style.display = "block";
     return;
   }
@@ -1110,7 +1635,7 @@ async function doLogin(){
   try{
     const result = await attemptLogin(phone, marketId);
     if(!result){
-      errBox.textContent = "전화번호 또는 마켓 ID를 확인해주세요.";
+      errBox.textContent = "ID 또는 PW를 확인해주세요.";
       errBox.style.display = "block";
       return;
     }
@@ -1139,11 +1664,12 @@ document.getElementById("exportBtn").addEventListener("click", exportExcel);
 async function showDashboard(){
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("dashboard").style.display = "block";
+  switchView("overview");
   await renderDashboardForSession();
 }
 
 /* ============================================================
-   13. Settings modal
+   17. Settings modal
 =============================================================*/
 const overlay = document.getElementById("settingsOverlay");
 function openSettings(){
@@ -1186,8 +1712,8 @@ function renderDetectedMap(headers, detected){
   let html = '<div class="map-grid">';
   DATA_FIELDS.forEach(f=>{
     const matched = detected[f.key];
-    html += `<div><label style="font-size:11.5px;color:var(--ink-soft);display:block;margin-bottom:4px;">${f.label}</label>
-      <div style="padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:${matched?'var(--bg)':'var(--accent-soft)'};color:${matched?'var(--ink)':'var(--accent-ink)'};">
+    html += `<div><label style="font-size:11.5px;color:var(--text-secondary);display:block;margin-bottom:4px;">${f.label}</label>
+      <div style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;background:${matched?'var(--surface-2)':'var(--critical-bg)'};color:${matched?'var(--text-primary)':'var(--critical-text)'};">
         ${matched || "인식 안 됨"}
       </div></div>`;
   });
@@ -1244,7 +1770,7 @@ document.getElementById("settingsSaveBtn").addEventListener("click", ()=>{
   const newPw = document.getElementById("newSettingsPw").value;
   if(newPw) settings.settingsPassword = newPw;
   saveSettings(settings);
-  rawDataCache = null; rawDataHeaders = null; // force reload
+  rawDataCache = null; rawDataHeaders = null;
   const statusEl = document.getElementById("settingsSaveStatus");
   statusEl.className = "status-msg ok";
   statusEl.textContent = "저장했어요. (이 브라우저에만 적용돼요)";
@@ -1254,7 +1780,7 @@ document.getElementById("settingsSaveBtn").addEventListener("click", ()=>{
 });
 
 /* ============================================================
-   14. Boot
+   18. Boot
 =============================================================*/
 (async function boot(){
   document.getElementById("screenLoading").classList.add("hidden");
