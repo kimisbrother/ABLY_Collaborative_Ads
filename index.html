@@ -105,30 +105,20 @@ a{color:inherit;}
 }
 @keyframes sheen{ from{transform:translateX(-100%);} to{transform:translateX(100%);} }
 
+/* ---------- Brand mark (fixed brand colors, not theme-dependent) ---------- */
+.brand-mark{
+  width:28px; height:28px; border-radius:8px; background:#ffffff; border:1px solid rgba(0,0,0,.14);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#0b0b0b; font-weight:800; font-size:13px;
+}
+.brand-mark.lg{width:36px; height:36px; font-size:16px; border-radius:10px;}
+
 /* ---------- Login ---------- */
 #loginScreen{ min-height:100vh; display:flex; }
-.login-visual{
-  flex:1.1; position:relative; display:flex; flex-direction:column; justify-content:space-between;
-  padding:52px 56px; color:#fff; overflow:hidden;
-  background:
-    radial-gradient(720px 480px at 8% 8%, rgba(255,255,255,.14), transparent 60%),
-    radial-gradient(640px 520px at 92% 88%, rgba(255,255,255,.10), transparent 55%),
-    linear-gradient(155deg, #16171A 0%, #23242a 55%, var(--brand-ink) 150%);
-}
-.login-visual .lv-brand{display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:-.01em;}
-.login-visual .lv-brand .mark{width:30px; height:30px; border-radius:8px; background:var(--brand); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;}
-.login-visual .lv-copy{max-width:420px;}
-.login-visual .lv-copy h2{font-family:var(--display); font-size:34px; line-height:1.28; letter-spacing:-.02em; margin:0 0 16px; font-weight:600;}
-.login-visual .lv-copy p{font-size:14px; line-height:1.7; color:rgba(255,255,255,.68); margin:0;}
-.login-visual .lv-stats{display:flex; gap:28px; margin-top:36px;}
-.login-visual .lv-stats div b{display:block; font-family:var(--mono); font-size:20px; font-weight:700;}
-.login-visual .lv-stats div span{font-size:11px; color:rgba(255,255,255,.55);}
-.login-visual .lv-foot{font-size:11px; color:rgba(255,255,255,.4); font-family:var(--mono);}
-
 .login-form-wrap{
   flex:1; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--page);
 }
 .login-card{ width:100%; max-width:360px; }
+.login-card .brand-mark{margin-bottom:20px;}
 .login-card h1{font-size:21px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; font-family:var(--display);}
 .login-card p.sub{font-size:13px; color:var(--text-secondary); margin:0 0 28px; line-height:1.5;}
 .field{margin-bottom:14px;}
@@ -158,8 +148,6 @@ a{color:inherit;}
 .login-foot{margin-top:22px; text-align:center;}
 .link-btn{ background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
 
-@media (max-width: 880px){ .login-visual{display:none;} }
-
 /* ---------- App shell ---------- */
 #dashboard{min-height:100vh; display:none;}
 .app-shell{display:flex; min-height:100vh;}
@@ -170,7 +158,6 @@ a{color:inherit;}
   display:flex; flex-direction:column; position:sticky; top:0; height:100vh; z-index:30;
 }
 .sidebar-brand{display:flex; align-items:center; gap:9px; padding:20px 18px 16px;}
-.sidebar-brand .mark{width:28px; height:28px; border-radius:8px; background:var(--brand); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px;}
 .sidebar-brand .name{font-family:var(--display); font-weight:700; font-size:14.5px; letter-spacing:-.01em;}
 .sidebar-nav{padding:8px 12px; display:flex; flex-direction:column; gap:2px;}
 .nav-item{
@@ -315,7 +302,7 @@ a{color:inherit;}
 .compare-row:first-of-type{border-top:none;}
 .compare-row .m-label{font-size:12px; color:var(--text-secondary); font-weight:500;}
 .compare-row .m-val{font-size:12.8px; font-weight:700; font-family:var(--mono);}
-.compare-row .m-delta{margin-left:8px;}
+.compare-row .m-delta{margin-left:18px;}
 
 /* ---------- funnel ---------- */
 .funnel-row{display:grid; grid-template-columns:96px 1fr 108px; align-items:center; gap:12px; margin-bottom:6px;}
@@ -363,38 +350,8 @@ tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:no
 
 .empty-note{padding:32px 0; text-align:center; color:var(--text-muted); font-size:12.5px;}
 
-/* ---------- settings ---------- */
-#settingsOverlay{
-  position:fixed; inset:0; background:rgba(10,10,10,.44); z-index:40; display:none;
-  align-items:flex-start; justify-content:center; padding:5vh 20px; overflow-y:auto;
-}
-.settings-panel{
-  background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:580px;
-  padding:28px 28px 24px; box-shadow:var(--shadow-md); margin-bottom:5vh; position:relative;
-}
-.settings-panel h2{font-size:16px; margin:0 0 4px;}
-.settings-panel p.sub{font-size:12.5px; color:var(--text-secondary); margin:0 0 22px;}
-.settings-section{border-top:1px solid var(--border); padding-top:16px; margin-top:16px;}
-.settings-section h4{font-size:12.5px; font-weight:700; margin:0 0 12px; display:flex; align-items:center; gap:6px;}
-.settings-section h4 .num{
-  width:18px; height:18px; border-radius:50%; background:var(--text-primary); color:var(--page); font-size:10px;
-  display:inline-flex; align-items:center; justify-content:center; font-weight:700;
-}
-.map-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-select{
-  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm);
-  font-size:13px; font-family:inherit; background:var(--page); color:var(--text-primary);
-}
-.settings-actions{display:flex; gap:8px; margin-top:22px;}
-.settings-actions .btn{flex:1;}
-.status-msg{font-size:11.5px; margin-top:8px; padding:8px 10px; border-radius:8px; display:none;}
-.status-msg.ok{display:block; background:var(--good-bg); color:var(--good-text);}
-.status-msg.err{display:block; background:var(--critical-bg); color:var(--critical-text);}
-.settings-close{position:absolute; top:20px; right:22px; background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-muted);}
-
 @media (max-width: 720px){
   .best-grid{grid-template-columns:1fr;}
-  .map-grid{grid-template-columns:1fr;}
   .compare-grid{grid-template-columns:1fr;}
   .hero-top{flex-direction:column;}
   .hero-progress{width:100%;}
@@ -409,21 +366,9 @@ select{
 
 <!-- ===================== LOGIN ===================== -->
 <div id="loginScreen" class="hidden">
-  <div class="login-visual">
-    <div class="lv-brand"><span class="mark">R</span> 협력광고 리포트</div>
-    <div class="lv-copy">
-      <h2>캠페인 성과를<br>한눈에 확인하세요</h2>
-      <p>예산 소진율부터 소재별 ROAS까지, 협력광고 운영 데이터를 하나의 대시보드에서 실시간으로 확인할 수 있어요.</p>
-      <div class="lv-stats">
-        <div><b>Daily</b><span>자동 업데이트</span></div>
-        <div><b>All</b><span>소재 · 목적 · 기간</span></div>
-        <div><b>Export</b><span>엑셀 다운로드</span></div>
-      </div>
-    </div>
-    <div class="lv-foot">Performance Reporting Dashboard</div>
-  </div>
   <div class="login-form-wrap">
     <div class="login-card">
+      <div class="brand-mark lg">A</div>
       <h1>로그인</h1>
       <p class="sub">발급받은 ID와 PW로 로그인해주세요.</p>
       <div class="field">
@@ -436,9 +381,6 @@ select{
       </div>
       <button class="btn btn-primary" id="loginBtn">로그인</button>
       <div class="login-error" id="loginError"></div>
-      <div class="login-foot">
-        <button class="link-btn" id="openSettingsFromLogin">관리자 설정</button>
-      </div>
     </div>
   </div>
 </div>
@@ -448,7 +390,7 @@ select{
   <div class="app-shell">
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand"><span class="mark">R</span><span class="name">협력광고 리포트</span></div>
+      <div class="sidebar-brand"><span class="brand-mark">A</span><span class="name">협력광고 리포트</span></div>
 
       <div class="sidebar-brief">
         <div class="sb-name" id="sbBrand">-</div>
@@ -465,7 +407,7 @@ select{
         </button>
         <button class="nav-item" data-view="trends">
           <svg viewBox="0 0 24 24"><polyline points="3,17 9,11 13,15 21,6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15,6 21,6 21,12" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Trends
+          Timeline
         </button>
         <button class="nav-item" data-view="creative">
           <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><polyline points="3,17 9,12 13,15 21,9" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -481,8 +423,6 @@ select{
 
       <div class="sidebar-foot">
         <button class="nav-item" id="themeToggleBtn"><span id="themeIcon">☀</span> <span id="themeLabel">테마</span></button>
-        <button class="nav-item" id="exportBtn">⭳ 엑셀 내보내기</button>
-        <button class="nav-item" id="settingsBtn">⚙ 설정</button>
         <button class="nav-item" id="logoutBtn">⏻ 로그아웃</button>
       </div>
     </aside>
@@ -585,62 +525,6 @@ select{
   </div>
 </div>
 
-<!-- ===================== SETTINGS ===================== -->
-<div id="settingsOverlay">
-  <div class="settings-panel">
-    <button class="settings-close" id="settingsCloseBtn">✕</button>
-
-    <div id="settingsLockView">
-      <h2>관리자 설정</h2>
-      <p class="sub">설정 비밀번호를 입력하세요. 처음 사용하는 경우 비밀번호 없이 바로 설정할 수 있어요.</p>
-      <div class="field">
-        <input id="settingsPwInput" type="password" placeholder="설정 비밀번호">
-      </div>
-      <button class="btn btn-primary" id="settingsUnlockBtn">확인</button>
-      <div class="status-msg err" id="settingsLockError"></div>
-    </div>
-
-    <div id="settingsFormView" class="hidden">
-      <h2>관리자 설정</h2>
-      <p class="sub">데이터 연결과 로그인 정보를 관리합니다. 이 화면은 담당자만 접근해야 해요.</p>
-
-      <div class="settings-section">
-        <h4><span class="num">1</span> 로그인 / 브랜드 정보 시트</h4>
-        <p class="sub" style="margin-bottom:10px;">브랜드, 총 예산, 집행기간, 마켓 ID, 전화번호가 담긴 구글시트를 <b>웹에 게시 &gt; CSV</b>로 발행한 링크를 넣으세요. 헤더 이름에 해당 단어가 포함되어 있으면 자동으로 인식돼요.</p>
-        <div class="field">
-          <input id="loginCsvUrl" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv">
-        </div>
-        <button class="btn btn-ghost btn-sm" id="testLoginCsvBtn">연결 확인</button>
-        <div class="status-msg" id="loginCsvStatus"></div>
-      </div>
-
-      <div class="settings-section">
-        <h4><span class="num">2</span> 성과 데이터 시트</h4>
-        <p class="sub" style="margin-bottom:10px;">Supermetrics 등에서 뽑은 일별 원본 데이터 CSV 링크입니다. 컬럼은 헤더명 키워드로 자동 인식돼요 (날짜/브랜드/소재/지출/노출/클릭/장바구니/구매/전환값).</p>
-        <div class="field">
-          <input id="dataCsvUrl" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv">
-        </div>
-        <button class="btn btn-ghost btn-sm" id="testDataCsvBtn">연결 확인</button>
-        <div class="status-msg" id="dataCsvStatus"></div>
-        <div id="mapGridWrap" style="margin-top:14px;"></div>
-      </div>
-
-      <div class="settings-section">
-        <h4><span class="num">3</span> 설정 비밀번호</h4>
-        <div class="field">
-          <input id="newSettingsPw" type="password" placeholder="새 비밀번호 (선택)">
-        </div>
-      </div>
-
-      <div class="settings-actions">
-        <button class="btn btn-ghost" id="settingsCancelBtn">취소</button>
-        <button class="btn btn-primary" id="settingsSaveBtn">저장</button>
-      </div>
-      <div class="status-msg" id="settingsSaveStatus"></div>
-    </div>
-  </div>
-</div>
-
 <script>
 (function(){
 "use strict";
@@ -648,45 +532,22 @@ select{
 /* ============================================================
    0. Constants / storage
 =============================================================*/
-const LS_KEY = "ably_dashboard_settings_v1";
 const SESSION_KEY = "ably_dashboard_session_v1";
 const THEME_KEY = "ably_dashboard_theme_v1";
 
-// 기본값: 코드에 직접 심어둔 값. 모든 방문자 브라우저에서 동일하게 적용됨.
-// 설정 화면에서 값을 바꾸면 "그 브라우저에서만" 아래 기본값을 덮어씀 (관리자 테스트용).
-// 모든 사람에게 영구적으로 바꾸려면 이 값 자체를 수정해서 다시 배포해야 함.
-const DEFAULT_SETTINGS = {
+// 데이터 연결 URL. 모든 방문자 브라우저에서 동일하게 적용됨.
+// 바꾸려면 이 값 자체를 수정해서 다시 배포해야 함.
+const settings = {
   loginCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX0dpUP1tAgkW9R5oL04HjtE759zMM9IyG7NkREAJVY6yBaneICVvRESqK2zsf6a_bsUiJ0Ch8Y-Ax/pub?gid=0&single=true&output=csv",
-  dataCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT-JO3OCDZVB0tAOqBaLG2yUUnA5ABDU-T-laTl7aqQPqYY3w36gASGyNREOApQRIzTE22czn-vAu6J/pub?gid=0&single=true&output=csv",
-  settingsPassword: "rladmsgud1!"
+  dataCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT-JO3OCDZVB0tAOqBaLG2yUUnA5ABDU-T-laTl7aqQPqYY3w36gASGyNREOApQRIzTE22czn-vAu6J/pub?gid=0&single=true&output=csv"
 };
 
-const DATA_FIELDS = [
-  {key:"date", label:"날짜"},
-  {key:"brand", label:"브랜드"},
-  {key:"creative", label:"소재명 (Creative / Ad name)"},
-  {key:"cost", label:"광고비 (VAT 포함)"},
-  {key:"impressions", label:"노출"},
-  {key:"clicks", label:"클릭"},
-  {key:"cart", label:"장바구니 담기"},
-  {key:"purchases", label:"구매"},
-  {key:"revenue", label:"구매전환값"},
-  {key:"objective", label:"목적 (Objective)"}
-];
-
-function loadSettings(){
-  let stored = {};
-  try{ stored = JSON.parse(localStorage.getItem(LS_KEY)) || {}; }catch(e){ stored = {}; }
-  return Object.assign({}, DEFAULT_SETTINGS, stored);
-}
-function saveSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
 function loadSession(){
   try{ return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null; }catch(e){ return null; }
 }
 function saveSession(s){ sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
 function clearSession(){ sessionStorage.removeItem(SESSION_KEY); }
 
-let settings = loadSettings();
 let session = loadSession();
 let rawDataCache = null; // all rows from data csv, unfiltered
 let rawDataHeaders = null; // header row of data csv, used for auto column detection
@@ -1344,11 +1205,7 @@ function renderObjectiveDonut(objectiveRows, totalAgg){
    12. KPI tiles
 =============================================================*/
 function buildKPIGrid(totalAgg, dailySeries, session){
-  const lastActive = findLastActiveIndex(dailySeries);
-  const cur = lastActive >= 0 ? dailySeries[lastActive].agg : null;
-  const prev = lastActive >= 1 ? dailySeries[lastActive-1].agg : null;
   const last12 = dailySeries.slice(Math.max(0, dailySeries.length-12));
-
   const budgetPct = session.budget ? Math.min(totalAgg.cost/session.budget,1)*100 : 0;
 
   const tiles = [];
@@ -1362,7 +1219,7 @@ function buildKPIGrid(totalAgg, dailySeries, session){
 
   tiles.push(`
     <div class="kpi-tile">
-      <div class="kpi-top"><span class="kpi-label">누적 지출</span>${cur&&prev?deltaBadge(deltaPct(cur.cost,prev.cost),"+"+won(cur.cost)):""}</div>
+      <div class="kpi-top"><span class="kpi-label">누적 지출</span></div>
       <div class="kpi-value">${won(totalAgg.cost)}</div>
       <div class="kpi-foot">
         <div class="meter-track"><i style="width:${budgetPct}%"></i></div>
@@ -1372,28 +1229,28 @@ function buildKPIGrid(totalAgg, dailySeries, session){
 
   tiles.push(`
     <div class="kpi-tile">
-      <div class="kpi-top"><span class="kpi-label">총 매출 (구매전환값)</span>${cur&&prev?deltaBadge(deltaPct(cur.revenue,prev.revenue),"+"+won(cur.revenue)):""}</div>
+      <div class="kpi-top"><span class="kpi-label">총 매출 (구매전환값)</span></div>
       <div class="kpi-value">${won(totalAgg.revenue)}</div>
       <div class="kpi-foot">${sparklineSVG(last12.map(d=>d.agg.revenue))}</div>
     </div>`);
 
   tiles.push(`
     <div class="kpi-tile">
-      <div class="kpi-top"><span class="kpi-label">ROAS</span>${cur&&prev?deltaBadge(deltaPct(cur.roas,prev.roas),"+"+ratio(cur.roas)):""}</div>
+      <div class="kpi-top"><span class="kpi-label">ROAS</span></div>
       <div class="kpi-value">${ratio(totalAgg.roas)}</div>
       <div class="kpi-foot">${sparklineSVG(last12.map(d=>d.agg.roas))}</div>
     </div>`);
 
   tiles.push(`
     <div class="kpi-tile">
-      <div class="kpi-top"><span class="kpi-label">CTR</span>${cur&&prev?deltaBadge(deltaPct(cur.ctr,prev.ctr),"+"+pct(cur.ctr)):""}</div>
+      <div class="kpi-top"><span class="kpi-label">CTR</span></div>
       <div class="kpi-value">${pct(totalAgg.ctr)}</div>
       <div class="kpi-foot"><div class="kpi-sub">클릭 ${num(totalAgg.clicks)} / 노출 ${num(totalAgg.impressions)}</div></div>
     </div>`);
 
   tiles.push(`
     <div class="kpi-tile">
-      <div class="kpi-top"><span class="kpi-label">CPA (구매)</span>${cur&&prev?deltaBadge(deltaPct(cur.cpa,prev.cpa),"+"+won(cur.cpa)):""}</div>
+      <div class="kpi-top"><span class="kpi-label">CPA (구매)</span></div>
       <div class="kpi-value">${totalAgg.purchases ? won(totalAgg.cpa) : "-"}</div>
       <div class="kpi-foot"><div class="kpi-sub">구매 ${num(totalAgg.purchases)}건</div></div>
     </div>`);
@@ -1406,7 +1263,7 @@ function buildKPIGrid(totalAgg, dailySeries, session){
 =============================================================*/
 const VIEW_META = {
   overview:   {crumb:"Overview",   title:"전체 성과 요약"},
-  trends:     {crumb:"Trends",     title:"일자별 추이"},
+  trends:     {crumb:"Timeline",   title:"일자별 추이"},
   creative:   {crumb:"Creative",   title:"소재 성과"},
   objectives: {crumb:"Objectives", title:"목적별 성과"}
 };
@@ -1574,46 +1431,7 @@ function escapeHtml(s){
 }
 
 /* ============================================================
-   15. Export to Excel (SheetJS via CDN, loaded lazily)
-=============================================================*/
-let xlsxLoaded = false;
-function ensureXLSX(){
-  return new Promise((resolve,reject)=>{
-    if(xlsxLoaded && window.XLSX) return resolve();
-    const s = document.createElement("script");
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-    s.onload = ()=>{ xlsxLoaded = true; resolve(); };
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-async function exportExcel(){
-  if(!currentState.rows){ return; }
-  try{
-    await ensureXLSX();
-    const wb = XLSX.utils.book_new();
-    const rawSheet = currentState.rows.map(r=>({
-      날짜: fmtDate(r.date), 소재명: r.creative, 광고비: r.cost, 노출: r.impressions,
-      클릭: r.clicks, 장바구니담기: r.cart, 구매: r.purchases, 구매전환값: r.revenue
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rawSheet), "Raw");
-    const dailySheet = currentState.dailySeries.map(d=>({
-      날짜: fmtDate(d.date), 광고비:Math.round(d.agg.cost), 노출:d.agg.impressions, CPM:Math.round(d.agg.cpm),
-      클릭:d.agg.clicks, CTR:d.agg.ctr, CPC:Math.round(d.agg.cpc), 구매:d.agg.purchases, 구매전환값:Math.round(d.agg.revenue), ROAS:Number(d.agg.roas.toFixed(2))
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailySheet), "Daily");
-    const creativeSheet = currentState.creativeRows.map(c=>({
-      소재명:c.name, 광고비:Math.round(c.cost), 노출:c.impressions, 클릭:c.clicks, CTR:c.ctr, 구매:c.purchases, 구매전환값:Math.round(c.revenue), ROAS:Number(c.roas.toFixed(2))
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(creativeSheet), "Creative");
-    XLSX.writeFile(wb, `협력광고_${session.brand}_리포트_${fmtDate(new Date())}.xlsx`);
-  }catch(e){
-    alert("엑셀 내보내기에 실패했어요: " + e.message);
-  }
-}
-
-/* ============================================================
-   16. Login flow
+   15. Login flow
 =============================================================*/
 document.getElementById("loginBtn").addEventListener("click", doLogin);
 [document.getElementById("loginPhone"), document.getElementById("loginMarketId")].forEach(el=>{
@@ -1659,8 +1477,6 @@ document.getElementById("logoutBtn").addEventListener("click", ()=>{
   document.getElementById("loginMarketId").value = "";
 });
 
-document.getElementById("exportBtn").addEventListener("click", exportExcel);
-
 async function showDashboard(){
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("dashboard").style.display = "block";
@@ -1669,118 +1485,7 @@ async function showDashboard(){
 }
 
 /* ============================================================
-   17. Settings modal
-=============================================================*/
-const overlay = document.getElementById("settingsOverlay");
-function openSettings(){
-  overlay.style.display = "flex";
-  const hasPw = !!settings.settingsPassword;
-  document.getElementById("settingsLockView").classList.toggle("hidden", !hasPw);
-  document.getElementById("settingsFormView").classList.toggle("hidden", hasPw);
-  if(!hasPw) populateSettingsForm();
-}
-function closeSettings(){ overlay.style.display = "none"; }
-document.getElementById("settingsBtn")?.addEventListener("click", openSettings);
-document.getElementById("openSettingsFromLogin").addEventListener("click", openSettings);
-document.getElementById("settingsCloseBtn").addEventListener("click", closeSettings);
-document.getElementById("settingsCancelBtn").addEventListener("click", closeSettings);
-overlay.addEventListener("click", e=>{ if(e.target===overlay) closeSettings(); });
-
-document.getElementById("settingsUnlockBtn").addEventListener("click", ()=>{
-  const val = document.getElementById("settingsPwInput").value;
-  const errEl = document.getElementById("settingsLockError");
-  if(val === settings.settingsPassword){
-    document.getElementById("settingsLockView").classList.add("hidden");
-    document.getElementById("settingsFormView").classList.remove("hidden");
-    document.getElementById("settingsPwInput").value = "";
-    errEl.style.display = "none";
-    populateSettingsForm();
-  } else {
-    errEl.textContent = "비밀번호가 올바르지 않아요.";
-    errEl.style.display = "block";
-  }
-});
-
-function populateSettingsForm(){
-  document.getElementById("loginCsvUrl").value = settings.loginCsvUrl || "";
-  document.getElementById("dataCsvUrl").value = settings.dataCsvUrl || "";
-  document.getElementById("mapGridWrap").innerHTML = "";
-}
-
-function renderDetectedMap(headers, detected){
-  const wrap = document.getElementById("mapGridWrap");
-  let html = '<div class="map-grid">';
-  DATA_FIELDS.forEach(f=>{
-    const matched = detected[f.key];
-    html += `<div><label style="font-size:11.5px;color:var(--text-secondary);display:block;margin-bottom:4px;">${f.label}</label>
-      <div style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;background:${matched?'var(--surface-2)':'var(--critical-bg)'};color:${matched?'var(--text-primary)':'var(--critical-text)'};">
-        ${matched || "인식 안 됨"}
-      </div></div>`;
-  });
-  html += "</div>";
-  wrap.innerHTML = html;
-}
-
-document.getElementById("testLoginCsvBtn").addEventListener("click", async ()=>{
-  const url = document.getElementById("loginCsvUrl").value.trim();
-  const statusEl = document.getElementById("loginCsvStatus");
-  statusEl.className = "status-msg"; statusEl.textContent = "확인 중…"; statusEl.style.display="block";
-  try{
-    const {headers, rows} = await fetchCSV(url);
-    const cols = detectLoginColumns(headers);
-    const missing = Object.entries(cols).filter(([k,v])=>!v).map(([k])=>k);
-    if(missing.length){
-      statusEl.className = "status-msg err";
-      statusEl.textContent = `일부 컬럼을 인식하지 못했어요 (${missing.join(", ")}). 헤더명을 확인해주세요.`;
-    } else {
-      statusEl.className = "status-msg ok";
-      statusEl.textContent = `연결 성공: ${rows.length}개 행, 브랜드 ${new Set(rows.map(r=>r[cols.brand])).size}개 인식됨`;
-    }
-  }catch(e){
-    statusEl.className = "status-msg err";
-    statusEl.textContent = "연결 실패: " + e.message;
-  }
-});
-
-document.getElementById("testDataCsvBtn").addEventListener("click", async ()=>{
-  const url = document.getElementById("dataCsvUrl").value.trim();
-  const statusEl = document.getElementById("dataCsvStatus");
-  statusEl.className = "status-msg"; statusEl.textContent = "확인 중…"; statusEl.style.display="block";
-  try{
-    const {headers, rows} = await fetchCSV(url);
-    const detected = detectDataColumns(headers);
-    const missing = Object.entries(detected).filter(([k,v])=>!v).map(([k])=>k);
-    if(missing.length){
-      statusEl.className = "status-msg err";
-      statusEl.textContent = `일부 컬럼을 인식하지 못했어요 (${missing.join(", ")}). 아래에서 확인해주세요.`;
-    } else {
-      statusEl.className = "status-msg ok";
-      statusEl.textContent = `연결 성공: ${rows.length}개 행, 브랜드 ${new Set(rows.map(r=>r[detected.brand])).size}개 인식됨`;
-    }
-    renderDetectedMap(headers, detected);
-  }catch(e){
-    statusEl.className = "status-msg err";
-    statusEl.textContent = "연결 실패: " + e.message;
-  }
-});
-
-document.getElementById("settingsSaveBtn").addEventListener("click", ()=>{
-  settings.loginCsvUrl = document.getElementById("loginCsvUrl").value.trim();
-  settings.dataCsvUrl = document.getElementById("dataCsvUrl").value.trim();
-  const newPw = document.getElementById("newSettingsPw").value;
-  if(newPw) settings.settingsPassword = newPw;
-  saveSettings(settings);
-  rawDataCache = null; rawDataHeaders = null;
-  const statusEl = document.getElementById("settingsSaveStatus");
-  statusEl.className = "status-msg ok";
-  statusEl.textContent = "저장했어요. (이 브라우저에만 적용돼요)";
-  document.getElementById("newSettingsPw").value = "";
-  if(session) renderDashboardForSession();
-  setTimeout(closeSettings, 900);
-});
-
-/* ============================================================
-   18. Boot
+   16. Boot
 =============================================================*/
 (async function boot(){
   document.getElementById("screenLoading").classList.add("hidden");
