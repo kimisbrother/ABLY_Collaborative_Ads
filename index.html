@@ -115,8 +115,8 @@ a{color:inherit;}
 /* ---------- Login ---------- */
 #loginScreen{ min-height:100vh; display:flex; }
 .login-visual{
-  flex:1.1; position:relative; display:flex; flex-direction:column; justify-content:space-between;
-  padding:52px 56px; color:#fff; overflow:hidden;
+  flex:1.1; position:relative; display:flex; flex-direction:column; justify-content:center;
+  padding:64px; color:#fff; overflow:hidden;
   background:
     radial-gradient(760px 520px at 6% 4%, rgba(255,255,255,.13), transparent 62%),
     radial-gradient(620px 560px at 96% 100%, rgba(255,71,87,.30), transparent 58%),
@@ -126,16 +126,18 @@ a{color:inherit;}
   position:absolute; right:-2%; bottom:-5%; font-family:var(--display); font-weight:700; font-size:210px; line-height:1;
   color:#fff; opacity:.05; pointer-events:none; user-select:none; letter-spacing:-.03em; white-space:nowrap;
 }
-.login-visual .lv-mark{position:relative;}
 .login-visual .lv-copy{position:relative; max-width:460px;}
 .login-visual .lv-kicker{
   display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.1em;
-  text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:14px;
+  text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:16px;
 }
 .login-visual .lv-kicker::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 4px rgba(255,71,87,.22);}
-.login-visual .lv-copy h2{font-family:var(--display); font-size:44px; line-height:1.15; letter-spacing:-.02em; margin:0 0 14px; font-weight:700;}
-.login-visual .lv-tagline{font-size:18px; font-weight:600; color:rgba(255,255,255,.82); margin:0 0 12px; line-height:1.4;}
-.login-visual .lv-desc{font-size:13.5px; line-height:1.7; color:rgba(255,255,255,.5); margin:0; max-width:380px;}
+.login-visual .lv-copy h2{font-family:var(--display); font-size:52px; line-height:1.12; letter-spacing:-.02em; margin:0 0 16px; font-weight:700;}
+.login-visual .lv-tagline{font-size:18px; font-weight:600; color:rgba(255,255,255,.82); margin:0; line-height:1.4;}
+.login-visual .lv-desc{
+  font-size:13.5px; line-height:1.7; color:rgba(255,255,255,.48); max-width:380px;
+  margin:36px 0 0; padding-top:22px; border-top:1px solid rgba(255,255,255,.1);
+}
 @media (max-width: 880px){ .login-visual{display:none;} }
 
 .login-form-wrap{
@@ -391,7 +393,6 @@ tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:no
 <div id="loginScreen" class="hidden">
   <div class="login-visual">
     <div class="lv-watermark">ABLY</div>
-    <div class="lv-mark"><span class="brand-mark">A</span></div>
     <div class="lv-copy">
       <div class="lv-kicker">Performance Dashboard</div>
       <h2>협력광고 리포트</h2>
