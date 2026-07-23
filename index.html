@@ -123,22 +123,19 @@ a{color:inherit;}
     linear-gradient(165deg, #131418 0%, #1d1e23 50%, #241417 100%);
 }
 .login-visual .lv-watermark{
-  position:absolute; right:-6%; bottom:-14%; font-family:var(--display); font-weight:700; font-size:440px; line-height:1;
-  color:#fff; opacity:.045; pointer-events:none; user-select:none; letter-spacing:-.04em;
+  position:absolute; right:-2%; bottom:-5%; font-family:var(--display); font-weight:700; font-size:210px; line-height:1;
+  color:#fff; opacity:.05; pointer-events:none; user-select:none; letter-spacing:-.03em; white-space:nowrap;
 }
-.login-visual .lv-brand{position:relative; display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:-.01em;}
+.login-visual .lv-mark{position:relative;}
+.login-visual .lv-copy{position:relative; max-width:460px;}
 .login-visual .lv-kicker{
-  position:relative; display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.1em;
-  text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:18px;
+  display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:14px;
 }
 .login-visual .lv-kicker::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 4px rgba(255,71,87,.22);}
-.login-visual .lv-copy{position:relative; max-width:420px;}
-.login-visual .lv-copy h2{font-family:var(--display); font-size:36px; line-height:1.26; letter-spacing:-.02em; margin:0 0 16px; font-weight:600;}
-.login-visual .lv-copy p{font-size:14px; line-height:1.7; color:rgba(255,255,255,.62); margin:0;}
-.login-visual .lv-foot{
-  position:relative; font-size:11px; color:rgba(255,255,255,.42); font-family:var(--mono);
-  padding-top:18px; border-top:1px solid rgba(255,255,255,.1);
-}
+.login-visual .lv-copy h2{font-family:var(--display); font-size:44px; line-height:1.15; letter-spacing:-.02em; margin:0 0 14px; font-weight:700;}
+.login-visual .lv-tagline{font-size:18px; font-weight:600; color:rgba(255,255,255,.82); margin:0 0 12px; line-height:1.4;}
+.login-visual .lv-desc{font-size:13.5px; line-height:1.7; color:rgba(255,255,255,.5); margin:0; max-width:380px;}
 @media (max-width: 880px){ .login-visual{display:none;} }
 
 .login-form-wrap{
@@ -393,14 +390,14 @@ tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:no
 <!-- ===================== LOGIN ===================== -->
 <div id="loginScreen" class="hidden">
   <div class="login-visual">
-    <div class="lv-watermark">A</div>
-    <div class="lv-brand"><span class="brand-mark">A</span> 협력광고 리포트</div>
+    <div class="lv-watermark">ABLY</div>
+    <div class="lv-mark"><span class="brand-mark">A</span></div>
     <div class="lv-copy">
       <div class="lv-kicker">Performance Dashboard</div>
-      <h2>캠페인 성과를<br>한눈에 확인하세요</h2>
-      <p>예산 소진율부터 소재별 ROAS까지, 협력광고 운영 데이터를 하나의 대시보드에서 실시간으로 확인할 수 있어요.</p>
+      <h2>협력광고 리포트</h2>
+      <p class="lv-tagline">캠페인 성과를 한눈에 확인하세요</p>
+      <p class="lv-desc">예산 소진율부터 소재별 ROAS까지, 협력광고 운영 데이터를 하나의 대시보드에서 실시간으로 확인할 수 있어요.</p>
     </div>
-    <div class="lv-foot">실시간 데이터 연동 · 매일 자동 업데이트</div>
   </div>
   <div class="login-form-wrap">
     <div class="login-card">
