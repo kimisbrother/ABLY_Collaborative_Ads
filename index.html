@@ -597,10 +597,15 @@ const THEME_KEY = "ably_dashboard_theme_v1";
 const settings = {
   loginCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX0dpUP1tAgkW9R5oL04HjtE759zMM9IyG7NkREAJVY6yBaneICVvRESqK2zsf6a_bsUiJ0Ch8Y-Ax/pub?gid=0&single=true&output=csv",
   dataCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT-JO3OCDZVB0tAOqBaLG2yUUnA5ABDU-T-laTl7aqQPqYY3w36gASGyNREOApQRIzTE22czn-vAu6J/pub?gid=0&single=true&output=csv",
-  // Optional: a small sheet with just "소재명" / "이미지 URL" columns, published the same
-  // way (파일 > 공유 > 웹에 게시 > CSV). One row per creative. Leave "" to skip —
-  // creative tiles just fall back to the local-only drag/drop preview.
-  creativeImageCsvUrl: ""
+  // Optional: a small sheet with "브랜드" / "소재명" / "이미지 URL" columns, published the
+  // same way (파일 > 공유 > 웹에 게시 > CSV). One row per creative; 브랜드 is required so
+  // two advertisers reusing the same ad name don't collide. Leave "" to skip — creative
+  // tiles just fall back to the local-only drag/drop preview.
+  creativeImageCsvUrl: "",
+  // Optional: an Apps Script Web App /exec URL (see apps-script/creative-upload.gs) that
+  // accepts an uploaded creative image, stores it in Drive, and appends a row to the
+  // sheet above. Leave "" to skip — uploads stay local-only until this is wired up.
+  creativeUploadEndpoint: ""
 };
 
 function loadSession(){
@@ -764,11 +769,14 @@ async function loadRawData(){
 function detectImageColumns(headers){
   const find = (keywords) => headers.find(h => keywords.some(k => h.includes(k)));
   return {
+    brand: find(["브랜드"]),
     name: find(["소재","광고 이름","크리에이티브","Ad name"]),
     url: find(["이미지","URL","링크","Image"])
   };
 }
-let creativeImageMap = null; // Map<creativeName, imageUrl>, shared across every visitor
+function creativeImageMapKey(brand, name){ return String(brand).trim() + "::" + String(name).trim(); }
+let creativeImageMap = null; // Map<"브랜드::소재명", imageUrl> — brand-scoped so two
+                              // advertisers reusing the same ad name never collide
 async function loadCreativeImageMap(){
   if(creativeImageMap) return creativeImageMap;
   creativeImageMap = new Map();
@@ -776,10 +784,10 @@ async function loadCreativeImageMap(){
   try{
     const {headers, rows} = await fetchCSV(settings.creativeImageCsvUrl);
     const cols = detectImageColumns(headers);
-    if(!cols.name || !cols.url) return creativeImageMap;
+    if(!cols.brand || !cols.name || !cols.url) return creativeImageMap;
     rows.forEach(r=>{
-      const name = String(r[cols.name]).trim(), url = String(r[cols.url]).trim();
-      if(name && url) creativeImageMap.set(name, url);
+      const brand = r[cols.brand], name = r[cols.name], url = String(r[cols.url]).trim();
+      if(brand && name && url) creativeImageMap.set(creativeImageMapKey(brand, name), url);
     });
   }catch(e){ console.error("creative image sheet failed", e); }
   return creativeImageMap;
@@ -1256,11 +1264,34 @@ function renderCreativeTileImage(tile, dataUrl, isLocal){
   const badge = tile.querySelector(".ct-badge");
   if(badge) badge.textContent = dataUrl ? (isLocal ? "로컬 미리보기만 (나에게만 보임)" : "모두에게 공개됨") : "";
 }
+async function uploadCreativeImage(brand, creative, dataUrl){
+  const base64 = dataUrl.slice(dataUrl.indexOf(",")+1);
+  const mimeType = dataUrl.slice(5, dataUrl.indexOf(";"));
+  // text/plain avoids a CORS preflight — Apps Script Web Apps don't answer OPTIONS.
+  // e.postData.contents on the other end is the raw string regardless of this header.
+  const res = await fetch(settings.creativeUploadEndpoint, {
+    method: "POST",
+    headers: {"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({brand, creative, imageBase64: base64, mimeType})
+  });
+  const json = await res.json();
+  return json.url || null;
+}
+
 function setCreativeImage(tile, name, file){
   if(!file || !file.type || !file.type.startsWith("image/")) return;
-  downscaleImage(file, 480).then(dataUrl=>{
+  downscaleImage(file, 480).then(async dataUrl=>{
     try{ localStorage.setItem(creativeImgKey(name), dataUrl); }catch(e){ /* quota exceeded — still show it for this session */ }
-    renderCreativeTileImage(tile, dataUrl, true);
+    renderCreativeTileImage(tile, dataUrl, true); // instant local feedback while it uploads
+
+    if(!settings.creativeUploadEndpoint) return;
+    try{
+      const url = await uploadCreativeImage(session.brand, name, dataUrl);
+      if(url){
+        creativeImageMap.set(creativeImageMapKey(session.brand, name), url);
+        renderCreativeTileImage(tile, url, false); // now shared for every visitor
+      }
+    }catch(e){ console.error("creative image upload failed", e); }
   });
 }
 
@@ -1283,7 +1314,7 @@ async function renderCreativeGallery(creativeRows){
   wrap.querySelectorAll(".creative-tile").forEach((tile, i)=>{
     const name = creativeRows[i].name;
     const drop = tile.querySelector(".creative-drop");
-    const sharedUrl = sharedImages.get(name);
+    const sharedUrl = sharedImages.get(creativeImageMapKey(session.brand, name));
 
     if(sharedUrl){
       // 구글시트에 등록된, 모두에게 보이는 이미지 — 이 브라우저에서 바꿀 수 없음
