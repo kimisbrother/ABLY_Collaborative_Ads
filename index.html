@@ -359,6 +359,26 @@ a{color:inherit;}
 .best-card .metric{position:relative; font-size:23px; font-weight:800; font-family:var(--display);}
 .best-card .metric small{font-size:11px; color:rgba(255,255,255,.55); font-weight:600; margin-left:5px;}
 
+/* ---------- creative gallery ---------- */
+.creative-gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:16px;}
+.creative-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-sm);}
+.creative-drop{
+  aspect-ratio:4/3; background:var(--surface-2); position:relative; cursor:pointer; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; outline:none;
+}
+.creative-drop img{width:100%; height:100%; object-fit:cover; display:block;}
+.creative-drop .cd-hint{font-size:11px; color:var(--text-muted); text-align:center; padding:0 14px; line-height:1.5;}
+.creative-drop.drag{outline:2px dashed var(--brand); outline-offset:-2px;}
+.creative-drop .cd-remove{
+  position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; border:none;
+  background:rgba(0,0,0,.55); color:#fff; font-size:13px; line-height:1; cursor:pointer; display:none;
+}
+.creative-drop:hover .cd-remove{display:block;}
+.creative-tile .ct-name{font-size:12.5px; font-weight:700; padding:10px 12px 0; word-break:break-word;}
+.creative-metrics{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px 12px 12px;}
+.creative-metrics .cm-label{font-size:10px; color:var(--text-muted);}
+.creative-metrics .cm-val{font-size:12.5px; font-weight:700; font-family:var(--mono);}
+
 /* ---------- table ---------- */
 .table-scroll{overflow-x:auto;}
 table{width:100%; border-collapse:collapse; font-size:12.3px; white-space:nowrap;}
@@ -532,8 +552,8 @@ tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:no
         <div class="view" id="view-creative">
           <div class="best-grid" id="bestCreativeGrid"></div>
 
-          <div class="section-head"><h2>소재 포지셔닝</h2><span class="hint">가로: CTR · 세로: ROAS · 원 크기: 광고비</span></div>
-          <div class="card"><div class="chart-box tall"><canvas id="creativeScatter"></canvas></div></div>
+          <div class="section-head"><h2>소재 갤러리</h2><span class="hint">이미지는 이 브라우저에만 저장돼요</span></div>
+          <div class="creative-gallery" id="creativeGallery"></div>
 
           <div class="section-head"><h2>소재별 성과</h2></div>
           <div class="card"><div class="table-scroll" id="creativeTableWrap"></div></div>
@@ -1068,18 +1088,28 @@ const METRIC_OPTIONS = [
   {k:"impressions", label:"노출", fmt:num, kind:"line"},
   {k:"roas", label:"ROAS", fmt:ratio, kind:"line"}
 ];
-let currentTrendMetric = "revenue";
+let currentTrendMetrics = new Set(["revenue"]);
+const TREND_COLORS = ["--series-1","--series-2","--series-3","--series-4","--series-5","--series-6"];
 
 function renderMetricPills(){
   const wrap = document.getElementById("metricPillRow");
-  wrap.innerHTML = METRIC_OPTIONS.map(m=>
-    `<button class="pill${m.k===currentTrendMetric?' active':''}" data-metric="${m.k}">${m.label}</button>`
-  ).join("");
+  const order = METRIC_OPTIONS.filter(m=>currentTrendMetrics.has(m.k)).map(m=>m.k);
+  wrap.innerHTML = METRIC_OPTIONS.map(m=>{
+    const active = currentTrendMetrics.has(m.k);
+    const dot = active
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:${getCssVar(TREND_COLORS[order.indexOf(m.k)%TREND_COLORS.length])}"></span>`
+      : "";
+    return `<button class="pill${active?' active':''}" data-metric="${m.k}">${dot}${m.label}</button>`;
+  }).join("");
   wrap.querySelectorAll(".pill").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      currentTrendMetric = btn.dataset.metric;
-      wrap.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
+      const k = btn.dataset.metric;
+      if(currentTrendMetrics.has(k)){
+        if(currentTrendMetrics.size>1) currentTrendMetrics.delete(k); // always keep at least one selected
+      } else {
+        currentTrendMetrics.add(k);
+      }
+      renderMetricPills();
       renderTrendChart();
     });
   });
@@ -1089,36 +1119,47 @@ function renderTrendChart(){
   const series = currentState.dailySeries || [];
   const el = document.getElementById("dailyChart");
   if(!el || !series.length) return;
-  const opt = METRIC_OPTIONS.find(m=>m.k===currentTrendMetric);
+  const selected = METRIC_OPTIONS.filter(m=>currentTrendMetrics.has(m.k));
+  const single = selected.length===1;
   const grid = getCssVar("--grid");
   const muted = getCssVar("--text-muted");
-  const seriesColor = getCssVar("--series-1");
   destroyChart("daily");
   chartRefs.daily = new Chart(el.getContext("2d"), {
-    type: opt.kind,
+    type: single ? selected[0].kind : "line",
     data:{
       labels: series.map(s=>fmtShort(s.date)),
-      datasets:[{
-        label: opt.label,
-        data: series.map(s=>s.agg[opt.k]),
-        backgroundColor: opt.kind==="bar" ? seriesColor : colorWithAlpha(seriesColor,.12),
-        borderColor: seriesColor,
-        borderWidth: 2,
-        borderRadius: opt.kind==="bar" ? 4 : 0,
-        maxBarThickness: 24,
-        fill: opt.kind==="line",
-        tension:.3,
-        pointRadius: opt.kind==="line" ? 2 : 0,
-        pointBackgroundColor: seriesColor
-      }]
+      datasets: selected.map((opt,i)=>{
+        const color = getCssVar(TREND_COLORS[i%TREND_COLORS.length]);
+        const kind = single ? opt.kind : "line";
+        return {
+          label: opt.label, metricKey: opt.k,
+          data: series.map(s=>s.agg[opt.k]),
+          backgroundColor: kind==="bar" ? color : colorWithAlpha(color,.12),
+          borderColor: color,
+          borderWidth: 2,
+          borderRadius: kind==="bar" ? 4 : 0,
+          maxBarThickness: 24,
+          fill: single && kind==="line",
+          tension:.3,
+          pointRadius: kind==="line" ? 2 : 0,
+          pointBackgroundColor: color
+        };
+      })
     },
     options:{
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:"index", intersect:false},
       plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{ label: ctx => opt.label+": "+opt.fmt(ctx.parsed.y) }}
+        legend:{display: !single, position:"bottom", labels:{color:muted, font:{size:10.5}, boxWidth:10, boxHeight:10}},
+        tooltip:{callbacks:{ label: ctx => {
+          const opt = METRIC_OPTIONS.find(m=>m.k===ctx.dataset.metricKey);
+          return ctx.dataset.label+": "+opt.fmt(ctx.parsed.y);
+        }}}
       },
+      // ponytail: one shared y-axis for every selected metric. Fine as long as the
+      // combo is roughly same-scale (counts, ₩); a %-scale metric (CTR/ROAS) picked
+      // alongside a ₩-scale one can look flat. Add a second y-axis (yAxisID) if that
+      // combination turns out to matter in practice.
       scales:{
         y:{ grid:{color:grid, drawTicks:false}, border:{display:false}, ticks:{callback:v=>compact(v), font:{size:10.5}, color:muted} },
         x:{ grid:{display:false}, border:{color:getCssVar("--baseline")}, ticks:{font:{size:10.5}, color:muted, maxRotation:0, autoSkip:true} }
@@ -1152,35 +1193,90 @@ function renderFunnel(agg){
   document.getElementById("funnelCard").innerHTML = html;
 }
 
-function renderCreativeScatter(creativeRows){
-  const el = document.getElementById("creativeScatter");
-  if(!el) return;
-  destroyChart("scatter");
-  const grid = getCssVar("--grid");
-  const muted = getCssVar("--text-muted");
-  const seriesColor = getCssVar("--series-1");
-  const maxCost = Math.max.apply(null, creativeRows.map(c=>c.cost)) || 1;
-  const points = creativeRows.filter(c=>c.cost>0).map(c=>({
-    x: c.ctr*100, y: c.roas, r: Math.max(5, Math.sqrt(c.cost/maxCost)*26), name: c.name, cost: c.cost
-  }));
-  if(!points.length){ el.parentElement.innerHTML = '<div class="empty-note">표시할 데이터가 없어요.</div>'; return; }
-  chartRefs.scatter = new Chart(el.getContext("2d"), {
-    type:"bubble",
-    data:{ datasets:[{ label:"소재", data: points, backgroundColor: colorWithAlpha(seriesColor,.35), borderColor: seriesColor, borderWidth:1.5 }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{ callbacks:{ label: ctx => {
-          const p = ctx.raw;
-          return [p.name, `CTR ${p.x.toFixed(2)}%`, `ROAS ${p.y.toFixed(2)}`, `광고비 ${won(p.cost)}`];
-        }}}
-      },
-      scales:{
-        x:{ title:{display:true, text:"CTR (%)", color:muted, font:{size:11}}, grid:{color:grid}, border:{color:getCssVar("--baseline")}, ticks:{color:muted, font:{size:10.5}} },
-        y:{ title:{display:true, text:"ROAS", color:muted, font:{size:11}}, grid:{color:grid}, border:{display:false}, ticks:{color:muted, font:{size:10.5}} }
+/* ---------- creative gallery (user-uploaded creative previews) ---------- */
+// ponytail: previews are stored as base64 in localStorage, keyed per brand+creative.
+// That's per-browser only (not synced across devices/teammates) and shares the
+// origin's ~5-10MB quota. Move to real file storage if that becomes a problem.
+const CREATIVE_METRICS = [
+  {k:"cost", label:"광고비", fmt:won},
+  {k:"ctr", label:"CTR", fmt:pct},
+  {k:"roas", label:"ROAS", fmt:ratio},
+  {k:"purchases", label:"구매", fmt:num}
+];
+function creativeImgKey(name){ return "ably_creative_img::" + (session ? session.brand : "") + "::" + name; }
+
+function downscaleImage(file, maxW){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxW/img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width*scale);
+      canvas.height = Math.round(img.height*scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", .82));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+function renderCreativeTileImage(tile, dataUrl){
+  tile.querySelector(".creative-drop").innerHTML = dataUrl
+    ? `<img src="${dataUrl}" alt=""><button class="cd-remove" type="button" title="삭제">✕</button>`
+    : `<div class="cd-hint">이미지를 드래그하거나<br>클릭해서 선택<br>(또는 Ctrl+V로 붙여넣기)</div>`;
+}
+function setCreativeImage(tile, name, file){
+  if(!file || !file.type || !file.type.startsWith("image/")) return;
+  downscaleImage(file, 480).then(dataUrl=>{
+    try{ localStorage.setItem(creativeImgKey(name), dataUrl); }catch(e){ /* quota exceeded — still show it for this session */ }
+    renderCreativeTileImage(tile, dataUrl);
+  });
+}
+
+function renderCreativeGallery(creativeRows){
+  const wrap = document.getElementById("creativeGallery");
+  if(!wrap) return;
+  if(!creativeRows.length){ wrap.innerHTML = '<div class="empty-note">표시할 데이터가 없어요.</div>'; return; }
+  wrap.innerHTML = creativeRows.map((c,i)=>`
+    <div class="creative-tile" data-idx="${i}">
+      <div class="creative-drop" tabindex="0"></div>
+      <div class="ct-name">${escapeHtml(c.name)}</div>
+      <div class="creative-metrics">${CREATIVE_METRICS.map(m=>
+        `<div><div class="cm-label">${m.label}</div><div class="cm-val">${m.fmt(c[m.k])}</div></div>`
+      ).join("")}</div>
+    </div>`
+  ).join("");
+
+  wrap.querySelectorAll(".creative-tile").forEach((tile, i)=>{
+    const name = creativeRows[i].name;
+    const drop = tile.querySelector(".creative-drop");
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*"; input.className = "hidden";
+    tile.appendChild(input);
+
+    let saved = null;
+    try{ saved = localStorage.getItem(creativeImgKey(name)); }catch(e){}
+    renderCreativeTileImage(tile, saved);
+
+    drop.addEventListener("click", e=>{
+      if(e.target.closest(".cd-remove")){
+        try{ localStorage.removeItem(creativeImgKey(name)); }catch(err){}
+        renderCreativeTileImage(tile, null);
+        return;
       }
-    }
+      input.click();
+    });
+    drop.addEventListener("dragover", e=>{ e.preventDefault(); drop.classList.add("drag"); });
+    drop.addEventListener("dragleave", ()=> drop.classList.remove("drag"));
+    drop.addEventListener("drop", e=>{
+      e.preventDefault(); drop.classList.remove("drag");
+      setCreativeImage(tile, name, e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+    drop.addEventListener("paste", e=>{
+      const item = Array.from(e.clipboardData.items || []).find(it=>it.type.startsWith("image/"));
+      if(item) setCreativeImage(tile, name, item.getAsFile());
+    });
+    input.addEventListener("change", ()=> setCreativeImage(tile, name, input.files[0]));
   });
 }
 
@@ -1311,7 +1407,7 @@ function switchView(name){
   document.getElementById("topbarTitle").textContent = VIEW_META[name].title;
   closeSidebarMobile();
   if(name==="trends") renderTrendChart();
-  if(name==="creative" && currentState.creativeRows) renderCreativeScatter(currentState.creativeRows);
+  if(name==="creative" && currentState.creativeRows) renderCreativeGallery(currentState.creativeRows);
   if(name==="objectives" && currentState.rows) renderObjectiveDonut(groupByObjective(currentState.rows), currentState.totalAgg);
 }
 document.querySelectorAll(".nav-item[data-view]").forEach(btn=>{
@@ -1344,7 +1440,6 @@ document.getElementById("themeToggleBtn").addEventListener("click", ()=>{
 });
 function rerenderAllCharts(){
   if(currentState.dailySeries) renderTrendChart();
-  if(document.getElementById("view-creative").classList.contains("active") && currentState.creativeRows) renderCreativeScatter(currentState.creativeRows);
   if(document.getElementById("view-objectives").classList.contains("active") && currentState.rows) renderObjectiveDonut(groupByObjective(currentState.rows), currentState.totalAgg);
 }
 applyTheme(localStorage.getItem(THEME_KEY));
@@ -1456,7 +1551,7 @@ async function renderDashboardForSession(){
     renderMetricPills();
     if(document.getElementById("view-trends").classList.contains("active")) renderTrendChart();
   }catch(e){ console.error("trend chart failed", e); }
-  try{ if(document.getElementById("view-creative").classList.contains("active")) renderCreativeScatter(creativeRows); }catch(e){ console.error("scatter failed", e); }
+  try{ if(document.getElementById("view-creative").classList.contains("active")) renderCreativeGallery(creativeRows); }catch(e){ console.error("creative gallery failed", e); }
   try{ if(document.getElementById("view-objectives").classList.contains("active")) renderObjectiveDonut(groupByObjective(rows), totalAgg); }catch(e){ console.error("donut failed", e); }
 
   document.getElementById("topbarUpdated").textContent = "업데이트 " + new Date().toLocaleString("ko-KR");
