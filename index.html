@@ -530,11 +530,11 @@ const settings = {
   // same way (파일 > 공유 > 웹에 게시 > CSV). One row per creative; 브랜드 is required so
   // two advertisers reusing the same ad name don't collide. Leave "" to skip — creative
   // tiles just fall back to the local-only drag/drop preview.
-  creativeImageCsvUrl: "",
+  creativeImageCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-S_UOq4szzR3QBWR2QGMLuNCPEF1RtkWzu-dGMwBEObUWQ850oOrRNdCfhZlAyxgunDzufKE7dYlj/pub?gid=0&single=true&output=csv",
   // Optional: a small sheet with "브랜드" / "제목" / "코멘트" columns (same publish-to-CSV
   // pattern). One row per save — the reader keeps only the latest row per (브랜드,제목).
   // Leave "" to skip — comment tabs only last for the current page load.
-  commentsCsvUrl: "",
+  commentsCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-S_UOq4szzR3QBWR2QGMLuNCPEF1RtkWzu-dGMwBEObUWQ850oOrRNdCfhZlAyxgunDzufKE7dYlj/pub?gid=802770773&single=true&output=csv",
   // Optional: one Apps Script Web App /exec URL (see apps-script/archive.gs) shared by
   // both the creative-image upload and the comment-save button. Leave "" to skip —
   // both features fall back to local-only, per-browser behavior.
