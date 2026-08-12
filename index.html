@@ -163,6 +163,7 @@ a{color:inherit;}
   display:inline-flex; align-items:center; justify-content:center; gap:6px;
 }
 .btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
 .btn-primary{background:var(--brand); color:#fff; width:100%; margin-top:6px;}
 .btn-primary:hover{opacity:.9;}
 .btn-dark{background:var(--text-primary); color:var(--page);}
@@ -291,19 +292,6 @@ a{color:inherit;}
 .spark-line{fill:none; stroke:var(--series-1); stroke-width:2; stroke-linejoin:round; stroke-linecap:round;}
 .spark-dot{fill:var(--series-1);}
 
-.meter-track{height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden;}
-.meter-track i{display:block; height:100%; background:var(--series-1); border-radius:4px;}
-.meter-label{font-size:10px; color:var(--text-muted); margin-top:5px; font-family:var(--mono);}
-
-/* ---------- insight ---------- */
-.insight{
-  background:var(--brand-soft); border:1px solid color-mix(in srgb, var(--brand) 30%, transparent); border-radius:var(--radius-md);
-  padding:16px 20px; margin-bottom:22px; display:flex; gap:14px; align-items:flex-start;
-}
-.insight .tag{ flex-shrink:0; font-size:10.5px; font-weight:700; color:#fff; background:var(--brand); padding:4px 8px; border-radius:6px; letter-spacing:.03em; margin-top:1px;}
-.insight ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px;}
-.insight li{font-size:12.6px; color:var(--text-primary); line-height:1.55; font-family:var(--mono);}
-
 /* ---------- best creative ---------- */
 .best-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
 .best-grid.top3{grid-template-columns:repeat(3,1fr);}
@@ -353,6 +341,7 @@ a{color:inherit;}
   width:100%; min-height:120px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius-sm);
   font-size:13.5px; font-family:inherit; line-height:1.6; background:var(--surface); color:var(--text-primary); resize:vertical;
 }
+.comment-body textarea:disabled{background:var(--surface-2); color:var(--text-muted); cursor:not-allowed;}
 .comment-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px;}
 .comment-hint{font-size:11px; color:var(--text-muted);}
 
@@ -473,11 +462,6 @@ tbody tr.total-row td{border-top:1px solid var(--text-primary); border-bottom:no
 
           <div class="section-head"><h2>전체 누적</h2></div>
           <div class="kpi-grid" id="kpiGrid"></div>
-
-          <div class="insight">
-            <span class="tag">DATA</span>
-            <ul id="insightList"><li>데이터를 불러오는 중입니다…</li></ul>
-          </div>
 
           <div class="section-head"><h2>최근 7일</h2><span class="hint">가장 최신 데이터 기준</span></div>
           <div class="kpi-grid" id="recent7Grid"></div>
@@ -961,34 +945,18 @@ function buildRecent7Grid(dailySeries){
   const recent = dailySeries.slice(-7);
   const agg = computeRatios(recent.reduce((a,d)=>{ addToAgg(a, d.agg); return a; }, emptyAgg()));
   const tiles = [
-    {label:"누적 지출", value: won(agg.cost)},
-    {label:"총 매출", value: won(agg.revenue)},
-    {label:"ROAS", value: pct(agg.roas)},
-    {label:"CPA (구매)", value: agg.purchases ? won(agg.cpa) : "-"}
+    {label:"누적 지출", value: won(agg.cost), foot: sparklineSVG(recent.map(d=>d.agg.cost))},
+    {label:"총 매출", value: won(agg.revenue), foot: sparklineSVG(recent.map(d=>d.agg.revenue))},
+    {label:"ROAS", value: pct(agg.roas), foot: sparklineSVG(recent.map(d=>d.agg.roas))},
+    {label:"CPA (구매)", value: agg.purchases ? won(agg.cpa) : "-", foot: `<div class="kpi-sub">구매 ${num(agg.purchases)}건</div>`}
   ];
   document.getElementById("recent7Grid").innerHTML = tiles.map(t=>`
     <div class="kpi-tile">
       <div class="kpi-top"><span class="kpi-label">${t.label}</span></div>
       <div class="kpi-value">${t.value}</div>
+      <div class="kpi-foot">${t.foot}</div>
     </div>`
   ).join("");
-}
-
-/* ============================================================
-   10. Insights (data-only, no action recommendations)
-=============================================================*/
-function buildInsights(dailySeries, weeklySeries, agg, budget, execStart, execEnd){
-  const items = [];
-  if(budget){
-    items.push(`예산 소진율 ${pct(agg.cost/budget)} (누적 지출 ${won(agg.cost)} / 총 예산 ${won(budget)})`);
-  }
-  if(dailySeries.length){
-    const recent = dailySeries.slice(-7);
-    const top = recent.reduce((a,b)=> b.agg.cost>a.agg.cost?b:a, recent[0] || dailySeries[dailySeries.length-1]);
-    items.push(`최근 7일 중 지출 최고일: ${fmtShort(top.date)} (${won(top.agg.cost)})`);
-  }
-  if(!items.length) items.push("특이사항 없음");
-  return items;
 }
 
 /* ============================================================
@@ -1203,9 +1171,13 @@ async function loadCommentTabs(brand){
 
 function showCommentBody(tabs){
   const tab = tabs.find(t=>t.title===activeCommentTitle);
-  document.getElementById("commentTextarea").value = tab ? tab.body : "";
-  document.getElementById("commentHint").textContent = settings.appsScriptEndpoint
-    ? "" : "Apps Script 연동 전이라 새로고침하면 사라져요.";
+  const ta = document.getElementById("commentTextarea");
+  ta.value = tab ? tab.body : "";
+  ta.disabled = !tab;
+  ta.placeholder = tab ? "이번 주 코멘트를 입력하세요…" : "+ 를 눌러 코멘트 탭을 추가하세요";
+  document.getElementById("commentSaveBtn").disabled = !tab;
+  document.getElementById("commentHint").textContent = !tab ? "" : (settings.appsScriptEndpoint
+    ? "" : "Apps Script 연동 전이라 새로고침하면 사라져요.");
 }
 
 function renderCommentTabs(tabs){
@@ -1233,8 +1205,7 @@ function renderCommentTabs(tabs){
 
 async function loadAndRenderComments(brand){
   const tabs = await loadCommentTabs(brand);
-  if(!tabs.length) tabs.push({title:"코멘트 1", body:""});
-  if(!activeCommentTitle || !tabs.find(t=>t.title===activeCommentTitle)) activeCommentTitle = tabs[tabs.length-1].title;
+  if(!tabs.find(t=>t.title===activeCommentTitle)) activeCommentTitle = tabs.length ? tabs[tabs.length-1].title : null;
   renderCommentTabs(tabs);
   showCommentBody(tabs);
 }
@@ -1273,7 +1244,6 @@ function colorWithAlpha(hex, alpha){
 =============================================================*/
 function buildKPIGrid(totalAgg, dailySeries, session){
   const last12 = dailySeries.slice(Math.max(0, dailySeries.length-12));
-  const budgetPct = session.budget ? Math.min(totalAgg.cost/session.budget,1)*100 : 0;
 
   const tiles = [];
 
@@ -1281,10 +1251,7 @@ function buildKPIGrid(totalAgg, dailySeries, session){
     <div class="kpi-tile">
       <div class="kpi-top"><span class="kpi-label">누적 지출</span></div>
       <div class="kpi-value">${won(totalAgg.cost)}</div>
-      <div class="kpi-foot">
-        <div class="meter-track"><i style="width:${budgetPct}%"></i></div>
-        <div class="meter-label">예산 소진율 ${session.budget?pct(totalAgg.cost/session.budget):"-"}</div>
-      </div>
+      <div class="kpi-foot">${sparklineSVG(last12.map(d=>d.agg.cost))}</div>
     </div>`);
 
   tiles.push(`
@@ -1375,7 +1342,7 @@ async function renderDashboardForSession(){
   try{
     if(!rawDataCache) await loadRawData();
   }catch(e){
-    document.getElementById("insightList").innerHTML = `<li>성과 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</li>`;
+    document.getElementById("kpiGrid").innerHTML = `<div class="empty-note">성과 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</div>`;
     return;
   }
 
@@ -1389,12 +1356,6 @@ async function renderDashboardForSession(){
   const creativeRows = groupByCreative(rows).sort((a,b)=>b.cost-a.cost);
 
   currentState = {rows, totalAgg, dailySeries, weeklySeries, creativeRows, execStart, execEnd};
-
-  try{
-    document.getElementById("insightList").innerHTML =
-      buildInsights(dailySeries, weeklySeries, totalAgg, session.budget, execStart, execEnd)
-        .map(t=>`<li>${t}</li>`).join("");
-  }catch(e){ console.error("insight render failed", e); }
 
   try{ buildKPIGrid(totalAgg, dailySeries, session); }catch(e){ console.error("kpi render failed", e); }
   try{ buildRecent7Grid(dailySeries); }catch(e){ console.error("recent7 render failed", e); }
