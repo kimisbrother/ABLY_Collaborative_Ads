@@ -394,8 +394,8 @@ tbody tr.total-row td{font-weight:700; border-top:1px solid var(--text-primary);
       <h1>로그인</h1>
       <p class="sub">발급받은 ID와 PW로 로그인해주세요.</p>
       <div class="field">
-        <label for="loginPhone">ID</label>
-        <input id="loginPhone" type="text" placeholder="ID" autocomplete="off">
+        <label for="loginEmail">ID (이메일)</label>
+        <input id="loginEmail" type="email" placeholder="이메일" autocomplete="off">
       </div>
       <div class="field">
         <label for="loginMarketId">PW</label>
@@ -649,22 +649,22 @@ function detectLoginColumns(headers){
     budget: find(["예산"]),
     period: find(["집행기간","기간"]),
     marketId: find(["마켓"]),
-    phone: find(["전화","연락처"])
+    email: find(["이메일","email","Email"])
   };
 }
 
-async function attemptLogin(phone, marketId){
+async function attemptLogin(email, marketId){
   if(!settings.loginCsvUrl){
     throw new Error("아직 로그인 정보가 연결되지 않았어요. 관리자에게 문의해주세요.");
   }
   const {headers, rows} = await fetchCSV(settings.loginCsvUrl);
   const cols = detectLoginColumns(headers);
-  if(!cols.brand || !cols.marketId || !cols.phone){
+  if(!cols.brand || !cols.marketId || !cols.email){
     throw new Error("로그인 시트의 컬럼을 인식하지 못했어요. 관리자에게 문의해주세요.");
   }
-  const normPhone = String(phone).replace(/[^0-9]/g,"");
+  const normEmail = String(email).trim().toLowerCase();
   const match = rows.find(r =>
-    String(r[cols.phone]).replace(/[^0-9]/g,"") === normPhone &&
+    String(r[cols.email]).trim().toLowerCase() === normEmail &&
     String(r[cols.marketId]).trim() === String(marketId).trim()
   );
   if(!match) return null;
@@ -672,7 +672,7 @@ async function attemptLogin(phone, marketId){
     brand: match[cols.brand],
     budget: cols.budget ? toNumber(match[cols.budget]) : 0,
     periodRaw: cols.period ? match[cols.period] : "",
-    phone: normPhone,
+    email: normEmail,
     marketId: marketId
   };
 }
@@ -1436,16 +1436,16 @@ function escapeHtml(s){
    15. Login flow
 =============================================================*/
 document.getElementById("loginBtn").addEventListener("click", doLogin);
-[document.getElementById("loginPhone"), document.getElementById("loginMarketId")].forEach(el=>{
+[document.getElementById("loginEmail"), document.getElementById("loginMarketId")].forEach(el=>{
   el.addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
 });
 
 async function doLogin(){
-  const phone = document.getElementById("loginPhone").value.trim();
+  const email = document.getElementById("loginEmail").value.trim();
   const marketId = document.getElementById("loginMarketId").value.trim();
   const errBox = document.getElementById("loginError");
   errBox.style.display = "none";
-  if(!phone || !marketId){
+  if(!email || !marketId){
     errBox.textContent = "ID와 PW를 모두 입력해주세요.";
     errBox.style.display = "block";
     return;
@@ -1453,7 +1453,7 @@ async function doLogin(){
   const btn = document.getElementById("loginBtn");
   btn.disabled = true; btn.textContent = "확인 중…";
   try{
-    const result = await attemptLogin(phone, marketId);
+    const result = await attemptLogin(email, marketId);
     if(!result){
       errBox.textContent = "ID 또는 PW를 확인해주세요.";
       errBox.style.display = "block";
@@ -1475,7 +1475,7 @@ document.getElementById("logoutBtn").addEventListener("click", ()=>{
   session = null;
   document.getElementById("dashboard").style.display = "none";
   document.getElementById("loginScreen").classList.remove("hidden");
-  document.getElementById("loginPhone").value = "";
+  document.getElementById("loginEmail").value = "";
   document.getElementById("loginMarketId").value = "";
 });
 
