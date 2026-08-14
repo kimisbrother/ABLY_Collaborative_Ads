@@ -1405,10 +1405,14 @@ async function renderDashboardForSession(){
 
   try{
     // most recent week first, so it doesn't get buried below older weeks — and flagged
-    // "진행중" when it doesn't yet span a full 7 days, since its totals are still climbing
-    const weeklyRows = weeklySeries.map(w=>({
+    // "진행중" only when it's the LATEST week and doesn't yet span a full 7 days (still
+    // accumulating). The first week can also be a short partial bucket if the campaign
+    // didn't start on a Sunday — that's a finished week, not "in progress", so only the
+    // last index qualifies, never a span check applied to every row.
+    const lastIdx = weeklySeries.length - 1;
+    const weeklyRows = weeklySeries.map((w,idx)=>({
       name: `${fmtShort(w.start)}~${fmtShort(w.end)}`, agg: w.agg,
-      inProgress: daysBetween(w.start, w.end) < 6
+      inProgress: idx === lastIdx && daysBetween(w.start, w.end) < 6
     })).reverse();
     renderMetricTable(document.getElementById("weeklyTableWrap"),
       [...weeklyRows, {name:"총계", agg:totalAgg}],
